@@ -1,6 +1,8 @@
 package com.lakitchen.LA.Kitchen.service.user;
 
-import com.lakitchen.LA.Kitchen.api.request.user.user.PostRequest;
+import com.lakitchen.LA.Kitchen.api.request.user.user.ChangePasswordRequest;
+import com.lakitchen.LA.Kitchen.api.request.user.user.RegisterRequest;
+import com.lakitchen.LA.Kitchen.api.request.user.user.UpdateProfileRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.model.entity.User;
 import com.lakitchen.LA.Kitchen.model.entity.UserRole;
@@ -32,12 +34,23 @@ public class UserServiceImpl implements UserService {
         return new BCryptPasswordEncoder().encode(text);
     }
 
+    private Boolean BCryptDecoder(String encodeText, String text) {
+        return new BCryptPasswordEncoder().matches(text, encodeText);
+    }
+
     private UserStatus activeStatus() {
         return userStatusRepository.findFirstById(1);
     }
 
     private UserRole roleUser() {
         return userRoleRepository.findFirstById(1);
+    }
+
+    private Boolean isActiveUser(Integer id) {
+        User user = userRepository.findFirstById(id);
+        UserStatus userStatus = userStatusRepository.findFirstById(user.getUserStatus().getId());
+
+        return userStatus.getId().equals(1);
     }
 
     private Boolean isExistEmail(String email) {
@@ -48,35 +61,102 @@ public class UserServiceImpl implements UserService {
         return userRepository.findFirstByPhoneNumber(phoneNumber) != null;
     }
 
-    private BasicResult validationRegister(PostRequest postRequest) {
-        if (postRequest.getEmail() == null || postRequest.getPhoneNumber() == null
-        || postRequest.getPassword() == null) {
+    private Boolean isExistUser(Integer id) {
+        return userRepository.findFirstById(id) != null;
+    }
+
+    private Boolean isExistPhoneNumberOther(Integer id, String phoneNumber) {
+        User user = userRepository.findFirstByPhoneNumber(phoneNumber);
+
+        if (user == null) {
+            return false;
+        }
+
+        return !user.getId().equals(id);
+    }
+
+    private Boolean isPasswordMatch(Integer id, String passwordText) {
+        User user = userRepository.findFirstById(id);
+
+        if (this.BCryptDecoder(user.getPassword(), passwordText)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private BasicResult validationRegister(RegisterRequest request) {
+        if (request.getEmail() == null || request.getPhoneNumber() == null
+        || request.getPassword() == null) {
             return new BasicResult(false, "Form tidak lengkap");
         }
 
-        if (this.isExistEmail(postRequest.getEmail())) {
+        if (this.isExistEmail(request.getEmail())) {
             return new BasicResult(false, "Email telah terdaftar");
         }
 
-        if (this.isExistPhoneNumber(postRequest.getPhoneNumber())) {
+        if (this.isExistPhoneNumber(request.getPhoneNumber())) {
             return new BasicResult(false, "Nomor HP telah terdaftar");
         }
 
         return new BasicResult(true, null);
     }
 
+    private BasicResult validationUpdateProfile(UpdateProfileRequest request) {
+        if (request.getId() == null || request.getName() == null ||
+        request.getAddress() == null || request.getProvince() == null ||
+        request.getCity() == null || request.getPhoneNumber() == null) {
+            return new BasicResult(false, "Form tidak lengkap");
+        }
+
+        if (!this.isExistUser(request.getId())) {
+            return new BasicResult(false, "User tidak ditemukan");
+        }
+
+        if (!this.isActiveUser(request.getId())) {
+            return new BasicResult(false, "User dalam status diblokir");
+        }
+
+        if (this.isExistPhoneNumberOther(request.getId(), request.getPhoneNumber())) {
+            return new BasicResult(false, "Nomor HP telah terdaftar");
+        }
+
+        return new BasicResult(true, null);
+    }
+
+    private BasicResult validationChangePassword(ChangePasswordRequest request) {
+        if (request.getId() == null || request.getOldPassword() == null
+        || request.getNewPassword() == null) {
+            return new BasicResult(false, "Form tidak lengkap");
+        }
+
+        if (!this.isExistUser(request.getId())) {
+            return new BasicResult(false, "User tidak ditemukan");
+        }
+
+        if (!this.isActiveUser(request.getId())) {
+            return new BasicResult(false, "User dalam status diblokir");
+        }
+
+        if (!this.isPasswordMatch(request.getId(), request.getOldPassword())) {
+            return new BasicResult(false, "Password salah");
+        }
+
+        return new BasicResult(true, null);
+    }
+
     @Override
-    public ResponseTemplate register(PostRequest postRequest) {
-        BasicResult basicResult = this.validationRegister(postRequest);
+    public ResponseTemplate register(RegisterRequest request) {
+        BasicResult basicResult = this.validationRegister(request);
 
         if (basicResult.getResult()) {
             User user = new User();
 
             user.setUserStatus(this.activeStatus());
             user.setUserRole(this.roleUser());
-            user.setEmail(postRequest.getEmail());
-            user.setPassword(this.BCryptEncoder(postRequest.getPassword()));
-            user.setPhoneNumber(postRequest.getPhoneNumber());
+            user.setEmail(request.getEmail());
+            user.setPassword(this.BCryptEncoder(request.getPassword()));
+            user.setPhoneNumber(request.getPhoneNumber());
             user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
             userRepository.save(user);
@@ -91,5 +171,57 @@ public class UserServiceImpl implements UserService {
                 null,
                 basicResult.getError());
     }
+
+    @Override
+    public ResponseTemplate updateProfile(UpdateProfileRequest request) {
+        BasicResult basicResult = this.validationUpdateProfile(request);
+
+        if (basicResult.getResult()) {
+            User user = userRepository.findFirstById(request.getId());
+
+            user.setName(request.getName());
+            user.setPhoneNumber(request.getPhoneNumber());
+            user.setAddress(request.getAddress());
+            user.setProvince(request.getProvince());
+            user.setCity(request.getCity());
+            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            userRepository.save(user);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(
+                400,
+                "BAD REQUEST",
+                null,
+                null,
+                basicResult.getError());
+    }
+
+    @Override
+    public ResponseTemplate changePassword(ChangePasswordRequest request) {
+        BasicResult basicResult = this.validationChangePassword(request);
+
+        if (basicResult.getResult()) {
+            User user = userRepository.findFirstById(request.getId());
+
+            user.setPassword(this.BCryptEncoder(request.getNewPassword()));
+            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            userRepository.save(user);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(
+                400,
+                "BAD REQUEST",
+                null,
+                null,
+                basicResult.getError());
+    }
+
+
 }
 

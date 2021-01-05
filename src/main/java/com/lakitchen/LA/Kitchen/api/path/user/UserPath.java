@@ -8,5 +8,5 @@ public class UserPath {
     public static final String USER = API + "/user";
     public static final String USER_POST = USER + "";
     public static final String USER_PUT = USER + "";
-
+    public static final String USER_CHANGE_PASSWORD = USER + "/changepassword";
 }
