@@ -1,15 +1,15 @@
 package com.lakitchen.LA.Kitchen.service.user;
 
-import com.lakitchen.LA.Kitchen.api.request.user.user.ChangePasswordRequest;
-import com.lakitchen.LA.Kitchen.api.request.user.user.RegisterRequest;
-import com.lakitchen.LA.Kitchen.api.request.user.user.UpdateProfileRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.user.ChangePasswordRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.user.RegisterRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.user.UpdateProfileRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.model.entity.User;
 import com.lakitchen.LA.Kitchen.model.entity.UserRole;
 import com.lakitchen.LA.Kitchen.model.entity.UserStatus;
-import com.lakitchen.LA.Kitchen.repository.user.UserRepository;
-import com.lakitchen.LA.Kitchen.repository.user.UserRoleRepository;
-import com.lakitchen.LA.Kitchen.repository.user.UserStatusRepository;
+import com.lakitchen.LA.Kitchen.repository.UserRepository;
+import com.lakitchen.LA.Kitchen.repository.UserRoleRepository;
+import com.lakitchen.LA.Kitchen.repository.UserStatusRepository;
 import com.lakitchen.LA.Kitchen.service.user.impl.UserService;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;

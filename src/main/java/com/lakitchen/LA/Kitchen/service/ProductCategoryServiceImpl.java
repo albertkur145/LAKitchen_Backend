@@ -1,5 +1,9 @@
 package com.lakitchen.LA.Kitchen.service;
 
+import com.lakitchen.LA.Kitchen.api.dto.CategoryDTO;
+import com.lakitchen.LA.Kitchen.api.dto.SubCategoryDTO;
+import com.lakitchen.LA.Kitchen.api.dto.format.SubCategoryFormat;
+import com.lakitchen.LA.Kitchen.api.response.data.GetCategories;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.data.ProductCategoryData;
 import com.lakitchen.LA.Kitchen.data.ProductSubCategoryData;
@@ -8,8 +12,12 @@ import com.lakitchen.LA.Kitchen.model.entity.ProductSubCategory;
 import com.lakitchen.LA.Kitchen.repository.ProductCategoryRepository;
 import com.lakitchen.LA.Kitchen.repository.ProductSubCategoryRepository;
 import com.lakitchen.LA.Kitchen.service.impl.ProductCategoryService;
+import com.lakitchen.LA.Kitchen.service.mapper.ProductCategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
@@ -19,6 +27,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Autowired
     private ProductSubCategoryRepository productSubCategoryRepository;
+
+    @Autowired
+    private ProductCategoryMapper productCategoryMapper;
 
     @Override
     public ResponseTemplate resetData() {
@@ -45,10 +56,69 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ResponseTemplate getCategories() {
-        return null;
+        ArrayList<ProductCategory> productCategoryList
+                = (ArrayList<ProductCategory>) productCategoryRepository
+                .findAll(Sort.by("name").ascending());
+
+        if (!productCategoryList.isEmpty()) {
+            ArrayList<CategoryDTO> categoryDTOS = new ArrayList<>();
+
+            for (ProductCategory val : productCategoryList) {
+                categoryDTOS.add(productCategoryMapper.mapToCategoryDTO(val));
+            }
+
+            return new ResponseTemplate(
+                    200, "OK",
+                    new GetCategories(categoryDTOS),
+                    null, null
+            );
+        }
+
+        return new ResponseTemplate(
+                404, "NOT FOUND", null,
+                null, "Data is empty"
+        );
     }
 
-    public void deleteAll() {
+    @Override
+    public ResponseTemplate getCategoriesAndSub() {
+        ArrayList<ProductCategory> productCategoryList
+                = (ArrayList<ProductCategory>) productCategoryRepository
+                .findAll(Sort.by("name").ascending());
+
+        if (!productCategoryList.isEmpty()) {
+            ArrayList<SubCategoryDTO> subCategoryDTOS = new ArrayList<>();
+
+            for (ProductCategory val : productCategoryList) {
+                ArrayList<ProductSubCategory> productSubCategoryList
+                        = (ArrayList<ProductSubCategory>) productSubCategoryRepository
+                        .findByProductCategory_IdOrderByNameAsc(val.getId());
+
+                ArrayList<SubCategoryFormat> subCategoryFormats = new ArrayList<>();
+
+                for (ProductSubCategory subVal : productSubCategoryList) {
+                    SubCategoryFormat subCategoryFormat = productCategoryMapper
+                            .productSubCategoryFormat(subVal);
+                    subCategoryFormats.add(subCategoryFormat);
+                }
+
+                subCategoryDTOS.add(productCategoryMapper.mapToSubCategoryDTO(val, subCategoryFormats));
+            }
+
+            return new ResponseTemplate(
+                    200, "OK",
+                    subCategoryDTOS,
+                    null, null
+            );
+        }
+
+        return new ResponseTemplate(
+                404, "NOT FOUND", null,
+                null, "Data is empty"
+        );
+    }
+
+    private void deleteAll() {
         productSubCategoryRepository.deleteAll();
         productCategoryRepository.deleteAll();
     }

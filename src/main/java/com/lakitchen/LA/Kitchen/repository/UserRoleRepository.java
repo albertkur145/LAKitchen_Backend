@@ -1,4 +1,4 @@
-package com.lakitchen.LA.Kitchen.repository.user;
+package com.lakitchen.LA.Kitchen.repository;
 
 import com.lakitchen.LA.Kitchen.model.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;

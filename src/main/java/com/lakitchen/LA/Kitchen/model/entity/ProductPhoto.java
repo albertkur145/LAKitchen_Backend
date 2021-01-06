@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.ProductPhotoConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class ProductPhoto implements Serializable {
     @Column(name = ProductPhotoConstant.ID)
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = ProductPhotoConstant.PRODUCT_ID)
     private Product product;

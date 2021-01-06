@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.ProductSubCategoryConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -21,10 +22,12 @@ public class ProductSubCategory implements Serializable {
     @Column(name = ProductSubCategoryConstant.NAME)
     private String name;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = ProductSubCategoryConstant.CATEGORY_ID)
     private ProductCategory productCategory;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productSubCategory", fetch = FetchType.LAZY)
     private Set<Product> products;
 }

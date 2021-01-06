@@ -1,4 +1,4 @@
-package com.lakitchen.LA.Kitchen.api.request.user.user;
+package com.lakitchen.LA.Kitchen.api.requestbody.user.user;
 
 import lombok.Data;
 

@@ -19,7 +19,12 @@ public class ProductCategoryController {
 
     @GetMapping(ProductCategoryPath.CATEGORY_GET_ALL)
     public ResponseTemplate getCategories() {
-        return null;
+        return productCategoryService.getCategories();
+    }
+
+    @GetMapping(ProductCategoryPath.CATEGORY_GET_ALL_WITH_SUB)
+    public ResponseTemplate getCategoriesAndSub() {
+        return productCategoryService.getCategoriesAndSub();
     }
 
     @PostMapping(ProductCategoryPath.CATEGORY_RESET)
