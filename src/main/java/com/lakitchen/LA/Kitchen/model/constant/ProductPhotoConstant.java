@@ -5,4 +5,5 @@ public class ProductPhotoConstant {
     public static final String ID = "id";
     public static final String PRODUCT_ID = "product_id";
     public static final String LINK = "link";
+    public static final String FILENAME = "filename";
 }

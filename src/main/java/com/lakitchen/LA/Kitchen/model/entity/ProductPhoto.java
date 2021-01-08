@@ -9,7 +9,8 @@ import java.io.Serializable;
 @Entity
 @Data
 @Table(name = ProductPhotoConstant.TABLE_NAME, uniqueConstraints = {
-        @UniqueConstraint(columnNames = ProductPhotoConstant.ID)
+        @UniqueConstraint(columnNames = ProductPhotoConstant.ID),
+        @UniqueConstraint(columnNames = ProductPhotoConstant.FILENAME)
 })
 public class ProductPhoto implements Serializable {
 
@@ -17,6 +18,9 @@ public class ProductPhoto implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = ProductPhotoConstant.ID)
     private Integer id;
+
+    @Column(name = ProductPhotoConstant.FILENAME)
+    private String filename;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

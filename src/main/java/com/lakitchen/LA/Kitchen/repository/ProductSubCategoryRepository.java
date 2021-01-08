@@ -10,4 +10,5 @@ import java.util.List;
 public interface ProductSubCategoryRepository extends JpaRepository<ProductSubCategory, Integer> {
 
     List<ProductSubCategory> findByProductCategory_IdOrderByNameAsc(Integer id);
+    ProductSubCategory findFirstById(Integer id);
 }

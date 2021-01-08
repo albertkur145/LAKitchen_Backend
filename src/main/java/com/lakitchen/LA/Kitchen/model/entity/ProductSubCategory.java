@@ -10,7 +10,8 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = ProductSubCategoryConstant.TABLE_NAME, uniqueConstraints = {
-        @UniqueConstraint(columnNames = ProductSubCategoryConstant.ID)
+        @UniqueConstraint(columnNames = ProductSubCategoryConstant.ID),
+        @UniqueConstraint(columnNames = ProductSubCategoryConstant.NAME)
 })
 public class ProductSubCategory implements Serializable {
 

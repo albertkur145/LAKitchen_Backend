@@ -6,5 +6,6 @@ public class ProductPath {
 
     // PRODUCT ENDPOINT
     public static final String PRODUCT = API + "/product";
+    public static final String PRODUCT_POST = PRODUCT + "";
     public static final String PRODUCT_UPLOAD_PHOTO = PRODUCT + "/upload";
 }

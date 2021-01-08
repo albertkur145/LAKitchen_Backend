@@ -1,8 +1,8 @@
 package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.dto.CategoryDTO;
+import com.lakitchen.LA.Kitchen.api.response.data.format.GetCategoriesAndSubFormat;
 import com.lakitchen.LA.Kitchen.api.dto.SubCategoryDTO;
-import com.lakitchen.LA.Kitchen.api.dto.format.SubCategoryFormat;
 import com.lakitchen.LA.Kitchen.api.response.data.GetCategories;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.data.ProductCategoryData;
@@ -87,27 +87,28 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 .findAll(Sort.by("name").ascending());
 
         if (!productCategoryList.isEmpty()) {
-            ArrayList<SubCategoryDTO> subCategoryDTOS = new ArrayList<>();
+            ArrayList<GetCategoriesAndSubFormat> getCategoriesAndSubFormats = new ArrayList<>();
 
             for (ProductCategory val : productCategoryList) {
+                CategoryDTO categoryDTO = new CategoryDTO(val.getId(), val.getName());
                 ArrayList<ProductSubCategory> productSubCategoryList
                         = (ArrayList<ProductSubCategory>) productSubCategoryRepository
                         .findByProductCategory_IdOrderByNameAsc(val.getId());
 
-                ArrayList<SubCategoryFormat> subCategoryFormats = new ArrayList<>();
+                ArrayList<SubCategoryDTO> subCategoryDTOS = new ArrayList<>();
 
                 for (ProductSubCategory subVal : productSubCategoryList) {
-                    SubCategoryFormat subCategoryFormat = productCategoryMapper
-                            .productSubCategoryFormat(subVal);
-                    subCategoryFormats.add(subCategoryFormat);
+                    SubCategoryDTO subCategoryDTO = new SubCategoryDTO(subVal.getId(), subVal.getName());
+                    subCategoryDTOS.add(subCategoryDTO);
                 }
 
-                subCategoryDTOS.add(productCategoryMapper.mapToSubCategoryDTO(val, subCategoryFormats));
+                getCategoriesAndSubFormats.add(productCategoryMapper
+                        .mapToCategoryAndSub(categoryDTO, subCategoryDTOS));
             }
 
             return new ResponseTemplate(
                     200, "OK",
-                    subCategoryDTOS,
+                    getCategoriesAndSubFormats,
                     null, null
             );
         }
