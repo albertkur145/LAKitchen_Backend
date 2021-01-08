@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.PaymentMethodConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -24,6 +25,7 @@ public class PaymentMethod implements Serializable {
     @Column(name = PaymentMethodConstant.NUMBER)
     private String number;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "paymentMethod", fetch = FetchType.LAZY)
     private Set<Payment> payments;
 }

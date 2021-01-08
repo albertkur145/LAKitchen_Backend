@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.OrderStatusConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class OrderStatus implements Serializable {
     @Column(name = OrderStatusConstant.NAME)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "orderStatus", fetch = FetchType.LAZY)
     private Set<Order> orders;
 }

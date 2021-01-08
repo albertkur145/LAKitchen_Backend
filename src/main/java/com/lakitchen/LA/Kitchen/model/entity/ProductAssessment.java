@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.ProductAssessmentConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -18,10 +19,12 @@ public class ProductAssessment implements Serializable {
     @Column(name = ProductAssessmentConstant.ID)
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = ProductAssessmentConstant.PRODUCT_ID)
     private Product product;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = ProductAssessmentConstant.USER_ID)
     private User user;

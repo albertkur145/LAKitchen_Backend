@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.OrderDetailConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -13,11 +14,13 @@ import java.io.Serializable;
 })
 public class OrderDetail implements Serializable {
 
+    @JsonIgnore
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderDetailConstant.ORDER_NUMBER)
     private Order order;
 
+    @JsonIgnore
     @Id
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderDetailConstant.PRODUCT_ID)

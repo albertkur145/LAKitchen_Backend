@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.UserRoleConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class UserRole implements Serializable {
     @Column(name = UserRoleConstant.NAME)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userRole", fetch = FetchType.LAZY)
     private Set<User> users;
 }

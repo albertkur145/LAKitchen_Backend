@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.ShopConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -27,10 +28,12 @@ public class Shop implements Serializable {
     @Column(name = ShopConstant.PHONE_NUMBER)
     private String phoneNumber;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = ShopConstant.USER_ID)
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
     private Set<Product> products;
 }

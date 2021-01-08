@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.UserConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -42,10 +43,12 @@ public class User implements Serializable {
     @Column(name = UserConstant.CITY)
     private String city;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = UserConstant.USER_STATUS_ID)
     private UserStatus userStatus;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = UserConstant.ROLE_ID)
     private UserRole userRole;
@@ -56,30 +59,39 @@ public class User implements Serializable {
     @Column(name = UserConstant.UPDATED_AT)
     private Timestamp updatedAt;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Shop shop;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<ProductAssessment> productAssessments;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Call> userCalls;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cs", fetch = FetchType.LAZY)
     private Set<Call> csCalls;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "from", fetch = FetchType.LAZY)
     private Set<Conversation> userMessageFrom;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "to", fetch = FetchType.LAZY)
     private Set<Conversation> userMessageTo;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Wishlist> wishlists;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Cart> carts;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Order> orders;
 }

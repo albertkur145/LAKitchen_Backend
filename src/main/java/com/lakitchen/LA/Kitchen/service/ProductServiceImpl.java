@@ -1,4 +1,4 @@
-package com.lakitchen.LA.Kitchen.service.admin;
+package com.lakitchen.LA.Kitchen.service;
 
 
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
@@ -12,7 +12,7 @@ import com.lakitchen.LA.Kitchen.repository.ProductPhotoRepository;
 import com.lakitchen.LA.Kitchen.repository.ProductRepository;
 import com.lakitchen.LA.Kitchen.repository.ProductSubCategoryRepository;
 import com.lakitchen.LA.Kitchen.repository.ShopRepository;
-import com.lakitchen.LA.Kitchen.service.admin.impl.ProductService;
+import com.lakitchen.LA.Kitchen.service.impl.ProductService;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;

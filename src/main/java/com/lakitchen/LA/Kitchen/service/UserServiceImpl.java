@@ -1,4 +1,4 @@
-package com.lakitchen.LA.Kitchen.service.user;
+package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.requestbody.user.user.ChangePasswordRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.user.user.RegisterRequest;
@@ -10,7 +10,7 @@ import com.lakitchen.LA.Kitchen.model.entity.UserStatus;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
 import com.lakitchen.LA.Kitchen.repository.UserRoleRepository;
 import com.lakitchen.LA.Kitchen.repository.UserStatusRepository;
-import com.lakitchen.LA.Kitchen.service.user.impl.UserService;
+import com.lakitchen.LA.Kitchen.service.impl.UserService;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

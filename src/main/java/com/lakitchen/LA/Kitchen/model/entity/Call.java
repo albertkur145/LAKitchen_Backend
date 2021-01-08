@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.CallConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -19,10 +20,12 @@ public class Call implements Serializable {
     @Column(name = CallConstant.ID)
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CallConstant.USER_ID)
     private User user;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CallConstant.CS_ID)
     private User cs;
@@ -33,6 +36,7 @@ public class Call implements Serializable {
     @Column(name = CallConstant.CREATED_AT)
     private Timestamp createdAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "call", fetch = FetchType.LAZY)
     private Set<Conversation> conversations;
 }

@@ -1,9 +1,9 @@
-package com.lakitchen.LA.Kitchen.controller.admin;
+package com.lakitchen.LA.Kitchen.controller;
 
-import com.lakitchen.LA.Kitchen.api.path.admin.ProductPath;
+import com.lakitchen.LA.Kitchen.api.path.ProductPath;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
-import com.lakitchen.LA.Kitchen.service.admin.ProductServiceImpl;
+import com.lakitchen.LA.Kitchen.service.ProductServiceImpl;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,7 @@ public class ProductController {
     @Autowired
     private ProductServiceImpl productService;
 
+    // ROLE_ADMIN
     @PostMapping(value = ProductPath.PRODUCT_UPLOAD_PHOTO)
     public ResponseTemplate uploadPhoto(
             @RequestParam("id") Integer productId,
@@ -28,11 +29,13 @@ public class ProductController {
         return productService.uploadPhoto(productId, files);
     }
 
+    // ROLE_ADMIN
     @PostMapping(ProductPath.PRODUCT_POST)
     public ResponseTemplate saveNewProduct(@RequestBody NewProductRequest objParam) {
         return productService.saveNewProduct(objParam);
     }
 
+    // ROLE_ADMIN
     @GetMapping(value = "/photo")
     public String getImage() throws IOException {
         byte[] bytes =  productService.getImageWithMediaType("13c7ae5d-0d0f-4aa3-a605-9ee96cdae370.jpg");

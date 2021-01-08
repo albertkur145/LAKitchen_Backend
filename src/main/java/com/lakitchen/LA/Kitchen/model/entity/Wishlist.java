@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.WishlistConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -14,11 +15,13 @@ import java.sql.Timestamp;
 })
 public class Wishlist implements Serializable {
 
+    @JsonIgnore
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = WishlistConstant.USER_ID)
     private User user;
 
+    @JsonIgnore
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = WishlistConstant.PRODUCT_ID)

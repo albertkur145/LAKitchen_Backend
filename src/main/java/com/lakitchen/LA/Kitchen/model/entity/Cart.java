@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.CartConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -14,11 +15,13 @@ import java.sql.Timestamp;
 })
 public class Cart implements Serializable {
 
+    @JsonIgnore
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CartConstant.USER_ID)
     private User user;
 
+    @JsonIgnore
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CartConstant.PRODUCT_ID)

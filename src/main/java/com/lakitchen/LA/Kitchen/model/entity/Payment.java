@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lakitchen.LA.Kitchen.model.constant.PaymentConstant;
 import lombok.Data;
 import javax.persistence.*;
@@ -13,11 +14,13 @@ import java.sql.Timestamp;
 })
 public class Payment implements Serializable {
 
+    @JsonIgnore
     @Id
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = PaymentConstant.ORDER_NUMBER)
     private Order order;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = PaymentConstant.PAYMENT_METHOD_ID)
     private PaymentMethod paymentMethod;
