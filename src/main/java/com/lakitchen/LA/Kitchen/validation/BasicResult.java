@@ -8,4 +8,6 @@ import lombok.Data;
 public class BasicResult {
     Boolean result;
     String error;
+    String status;
+    Integer code;
 }

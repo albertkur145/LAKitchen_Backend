@@ -30,6 +30,71 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRoleRepository userRoleRepository;
 
+    @Override
+    public ResponseTemplate register(RegisterRequest request) {
+        BasicResult result = this.validationRegister(request);
+
+        if (result.getResult()) {
+            User user = new User();
+
+            user.setUserStatus(this.activeStatus());
+            user.setUserRole(this.roleUser());
+            user.setEmail(request.getEmail());
+            user.setPassword(this.BCryptEncoder(request.getPassword()));
+            user.setPhoneNumber(request.getPhoneNumber());
+            user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
+            userRepository.save(user);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(),
+                null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate updateProfile(UpdateProfileRequest request) {
+        BasicResult result = this.validationUpdateProfile(request);
+
+        if (result.getResult()) {
+            User user = userRepository.findFirstById(request.getId());
+
+            user.setName(request.getName());
+            user.setPhoneNumber(request.getPhoneNumber());
+            user.setAddress(request.getAddress());
+            user.setProvince(request.getProvince());
+            user.setCity(request.getCity());
+            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            userRepository.save(user);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(),
+                null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate changePassword(ChangePasswordRequest request) {
+        BasicResult result = this.validationChangePassword(request);
+
+        if (result.getResult()) {
+            User user = userRepository.findFirstById(request.getId());
+
+            user.setPassword(this.BCryptEncoder(request.getNewPassword()));
+            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            userRepository.save(user);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(),
+                null, null, result.getError());
+    }
+
     private String BCryptEncoder(String text) {
         return new BCryptPasswordEncoder().encode(text);
     }
@@ -88,140 +153,62 @@ public class UserServiceImpl implements UserService {
     private BasicResult validationRegister(RegisterRequest request) {
         if (request.getEmail() == null || request.getPhoneNumber() == null
         || request.getPassword() == null) {
-            return new BasicResult(false, "Form tidak lengkap");
+            return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
         if (this.isExistEmail(request.getEmail())) {
-            return new BasicResult(false, "Email telah terdaftar");
+            return new BasicResult(false, "Email telah terdaftar", "CONFLICT", 409);
         }
 
         if (this.isExistPhoneNumber(request.getPhoneNumber())) {
-            return new BasicResult(false, "Nomor HP telah terdaftar");
+            return new BasicResult(false, "Nomor HP telah terdaftar", "CONFLICT", 409);
         }
 
-        return new BasicResult(true, null);
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationUpdateProfile(UpdateProfileRequest request) {
         if (request.getId() == null || request.getName() == null ||
         request.getAddress() == null || request.getProvince() == null ||
         request.getCity() == null || request.getPhoneNumber() == null) {
-            return new BasicResult(false, "Form tidak lengkap");
+            return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
         if (!this.isExistUser(request.getId())) {
-            return new BasicResult(false, "User tidak ditemukan");
+            return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 
         if (!this.isActiveUser(request.getId())) {
-            return new BasicResult(false, "User dalam status diblokir");
+            return new BasicResult(false, "User dalam status diblokir", "NOT ACCEPTABLE", 406);
         }
 
         if (this.isExistPhoneNumberOther(request.getId(), request.getPhoneNumber())) {
-            return new BasicResult(false, "Nomor HP telah terdaftar");
+            return new BasicResult(false, "Nomor HP telah terdaftar", "CONFLICT", 409);
         }
 
-        return new BasicResult(true, null);
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationChangePassword(ChangePasswordRequest request) {
         if (request.getId() == null || request.getOldPassword() == null
         || request.getNewPassword() == null) {
-            return new BasicResult(false, "Form tidak lengkap");
+            return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
         if (!this.isExistUser(request.getId())) {
-            return new BasicResult(false, "User tidak ditemukan");
+            return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 
         if (!this.isActiveUser(request.getId())) {
-            return new BasicResult(false, "User dalam status diblokir");
+            return new BasicResult(false, "User dalam status diblokir", "NOT ACCEPTABLE", 406);
         }
 
         if (!this.isPasswordMatch(request.getId(), request.getOldPassword())) {
-            return new BasicResult(false, "Password salah");
+            return new BasicResult(false, "Password salah", "BAD REQUEST", 400);
         }
 
-        return new BasicResult(true, null);
+        return new BasicResult(true, null, "OK", 200);
     }
-
-    @Override
-    public ResponseTemplate register(RegisterRequest request) {
-        BasicResult basicResult = this.validationRegister(request);
-
-        if (basicResult.getResult()) {
-            User user = new User();
-
-            user.setUserStatus(this.activeStatus());
-            user.setUserRole(this.roleUser());
-            user.setEmail(request.getEmail());
-            user.setPassword(this.BCryptEncoder(request.getPassword()));
-            user.setPhoneNumber(request.getPhoneNumber());
-            user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
-            userRepository.save(user);
-
-            return new ResponseTemplate(200, "OK", null, null, null);
-        }
-
-        return new ResponseTemplate(
-                400,
-                "BAD REQUEST",
-                null,
-                null,
-                basicResult.getError());
-    }
-
-    @Override
-    public ResponseTemplate updateProfile(UpdateProfileRequest request) {
-        BasicResult basicResult = this.validationUpdateProfile(request);
-
-        if (basicResult.getResult()) {
-            User user = userRepository.findFirstById(request.getId());
-
-            user.setName(request.getName());
-            user.setPhoneNumber(request.getPhoneNumber());
-            user.setAddress(request.getAddress());
-            user.setProvince(request.getProvince());
-            user.setCity(request.getCity());
-            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-
-            userRepository.save(user);
-
-            return new ResponseTemplate(200, "OK", null, null, null);
-        }
-
-        return new ResponseTemplate(
-                400,
-                "BAD REQUEST",
-                null,
-                null,
-                basicResult.getError());
-    }
-
-    @Override
-    public ResponseTemplate changePassword(ChangePasswordRequest request) {
-        BasicResult basicResult = this.validationChangePassword(request);
-
-        if (basicResult.getResult()) {
-            User user = userRepository.findFirstById(request.getId());
-
-            user.setPassword(this.BCryptEncoder(request.getNewPassword()));
-            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-
-            userRepository.save(user);
-
-            return new ResponseTemplate(200, "OK", null, null, null);
-        }
-
-        return new ResponseTemplate(
-                400,
-                "BAD REQUEST",
-                null,
-                null,
-                basicResult.getError());
-    }
-
 
 }
 
