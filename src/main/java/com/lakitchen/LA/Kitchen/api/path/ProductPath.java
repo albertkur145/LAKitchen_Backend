@@ -7,6 +7,9 @@ public class ProductPath {
     // ROLE_USER ENDPOINT
     private static final String PRODUCT = API + "/product";
     public static final String GET_PRODUCT_BY_SUBCATEGORY = PRODUCT + "/subcategory";
+    public static final String GET_PRODUCT_BY_CATEGORY = PRODUCT + "/category";
+    public static final String GET_PRODUCT_BY_NAME = PRODUCT + "/name";
+    public static final String GET_PRODUCT_BY_PRICE = PRODUCT + "/price";
 
     // ROLE_ADMIN ENDPOINT
     private static final String ADMIN_API = API + "/admin/product";

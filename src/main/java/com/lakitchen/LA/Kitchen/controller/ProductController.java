@@ -25,6 +25,24 @@ public class ProductController {
         return productService.getBySubCategory(subCategoryId);
     }
 
+    // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_CATEGORY)
+    public ResponseTemplate getByCategory(@RequestParam("categoryId") Integer categoryId) {
+        return productService.getByCategory(categoryId);
+    }
+
+    // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_NAME)
+    public ResponseTemplate getByName(@RequestParam("productName") String productName) {
+        return productService.getByName(productName);
+    }
+
+    // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_PRICE)
+    public ResponseTemplate getByPrice(@RequestParam("from") String from) {
+        return productService.getByPrice(from);
+    }
+
     // ROLE_ADMIN
     @PostMapping(ProductPath.ADMIN_PRODUCT_UPLOAD_PHOTO)
     public ResponseTemplate uploadPhoto(

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BySubCategoryDTO {
+public class ProductGeneralDTO {
     Integer id;
     String name;
     Integer price;

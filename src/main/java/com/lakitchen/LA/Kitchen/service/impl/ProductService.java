@@ -11,6 +11,9 @@ public interface ProductService {
 
     // ROLE_USER
     ResponseTemplate getBySubCategory(Integer subCategoryId);
+    ResponseTemplate getByCategory(Integer categoryId);
+    ResponseTemplate getByName(String productName);
+    ResponseTemplate getByPrice(String from);
 
     // ROLE_ADMIN
     ResponseTemplate uploadPhoto(Integer productId, ArrayList<MultipartFile> files);

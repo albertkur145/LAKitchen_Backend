@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
-public class GetBySubCategory {
-    String title;
+public class GetByName {
     ArrayList<ProductGeneralDTO> products;
 }

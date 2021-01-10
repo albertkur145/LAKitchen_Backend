@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Integer> {
 
     ProductCategory findFirstByName(String name);
+    ProductCategory findFirstById(Integer id);
+
 }

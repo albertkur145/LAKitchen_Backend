@@ -1,11 +1,14 @@
 package com.lakitchen.LA.Kitchen.service;
 
 
-import com.lakitchen.LA.Kitchen.api.dto.role_user.product.BySubCategoryDTO;
+import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductGeneralDTO;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.CreateProduct;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByCategory;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByName;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByPrice;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetBySubCategory;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
@@ -47,6 +50,9 @@ public class ProductServiceImpl implements ProductService {
     private ProductSubCategoryRepository productSubCategoryRepository;
 
     @Autowired
+    private ProductCategoryRepository productCategoryRepository;
+
+    @Autowired
     private ShopRepository shopRepository;
 
     @Autowired
@@ -61,39 +67,71 @@ public class ProductServiceImpl implements ProductService {
         if (result.getResult()) {
             ArrayList<Product> products = productRepository
                     .findByProductSubCategory_IdAndDeletedAt(subCategoryId, null);
-            ArrayList<BySubCategoryDTO> subCategoryDTOS = new ArrayList<>();
+            ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
             ProductSubCategory subCategory = productSubCategoryRepository.findFirstById(subCategoryId);
 
             products.forEach((val) -> {
-                ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(val.getId());
-                ArrayList<ProductAssessment> productAssessments = productAssessmentRepository
-                        .findByProduct_Id(val.getId());
-                Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
-                Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
-
-                String filePhotoName = null;
-                if (productPhoto != null) {
-                    filePhotoName = productPhoto.getFilename();
-                }
-
-                String photoLink = null;
-                try {
-                    photoLink = this.getImage(this.getExtensionFile(filePhotoName), this.getFilename(filePhotoName));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                BySubCategoryDTO formatMapper = productMapper.mapToGetBySubCategory(val, photoLink, rating, totalAssessment);
-                subCategoryDTOS.add(formatMapper);
+                ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+                productDTO.add(dto);
             });
 
             return new ResponseTemplate(200, "OK",
-                    new GetBySubCategory(subCategory.getName(), subCategoryDTOS),
+                    new GetBySubCategory(subCategory.getName(), productDTO),
                     null, null);
         }
 
-        return new ResponseTemplate(result.getCode(), result.getStatus(),
-                null, null, result.getError());
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getByCategory(Integer categoryId) {
+        BasicResult result = this.validationGetByCategory(categoryId);
+
+        if (result.getResult()) {
+            ArrayList<Product> products = productRepository.findByCategory(categoryId);
+            ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
+            ProductCategory category = productCategoryRepository.findFirstById(categoryId);
+
+            products.forEach((val) -> {
+                ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+                productDTO.add(dto);
+            });
+
+            return new ResponseTemplate(200, "OK",
+                    new GetByCategory(category.getName(), productDTO),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getByName(String productName) {
+        ArrayList<Product> products = productRepository
+                .findByNameIgnoreCaseContainingAndDeletedAt(productName, null);
+        ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
+
+        products.forEach((val) -> {
+            ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+            productDTO.add(dto);
+        });
+
+        return new ResponseTemplate(200, "OK", new GetByName(productDTO), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getByPrice(String from) {
+        String title = this.getTitleSelectionPrice(from);
+        ArrayList<Product> products = this.getSelectionPrice(from);
+        ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
+
+        products.forEach((val) -> {
+            ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+            productDTO.add(dto);
+        });
+
+        return new ResponseTemplate(200, "OK",
+                new GetByPrice(title, productDTO), null, null);
     }
 
     @Override
@@ -176,6 +214,44 @@ public class ProductServiceImpl implements ProductService {
                 null, null, result.getError());
     }
 
+    private String getTitleSelectionPrice(String from) {
+        if (from.equals("lowest")) {
+            return "Harga Terendah";
+        }
+
+        return "Harga Tertinggi";
+    }
+
+    private ArrayList<Product> getSelectionPrice(String from) {
+        if (from.equals("lowest")) {
+            return productRepository.findAllByDeletedAtOrderByPriceAsc(null);
+        }
+
+        return productRepository.findAllByDeletedAtOrderByPriceDesc(null);
+    }
+
+    private ProductGeneralDTO setToFormatGeneralDTO(Product val) {
+        ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(val.getId());
+        ArrayList<ProductAssessment> productAssessments = productAssessmentRepository
+                .findByProduct_Id(val.getId());
+        Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
+        Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
+
+        String filePhotoName = null;
+        if (productPhoto != null) {
+            filePhotoName = productPhoto.getFilename();
+        }
+
+        String photoLink = null;
+        try {
+            photoLink = this.getImage(this.getExtensionFile(filePhotoName), this.getFilename(filePhotoName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return productMapper.mapToProductGeneralDTO(val, photoLink, rating, totalAssessment);
+    }
+
     private Double getRating(Integer sumOfRate, Integer totalAssessment) {
         if (totalAssessment > 0) {
             DecimalFormat df = new DecimalFormat("#.##");
@@ -188,6 +264,14 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return null;
+    }
+
+    private BasicResult validationGetByCategory(Integer categoryId) {
+        if (!this.isExistCategory(categoryId)) {
+            return new BasicResult(false, "Kategori tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationGetBySubCategory(Integer subCategoryId) {
@@ -248,6 +332,10 @@ public class ProductServiceImpl implements ProductService {
         });
 
         return rate[0];
+    }
+
+    private Boolean isExistCategory(Integer id) {
+        return productCategoryRepository.findFirstById(id) != null;
     }
 
     private Boolean isExistSubCategory(Integer id) {
