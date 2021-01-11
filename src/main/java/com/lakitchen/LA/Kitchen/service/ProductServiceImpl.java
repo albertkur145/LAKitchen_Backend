@@ -1,9 +1,13 @@
 package com.lakitchen.LA.Kitchen.service;
 
 
+import com.lakitchen.LA.Kitchen.api.dto.ProductAssessmentDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
+import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductDetailDTO;
 import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductGeneralDTO;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.CreateProduct;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByCategory;
@@ -31,6 +35,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -130,8 +135,51 @@ public class ProductServiceImpl implements ProductService {
             productDTO.add(dto);
         });
 
-        return new ResponseTemplate(200, "OK",
-                new GetByPrice(title, productDTO), null, null);
+        return new ResponseTemplate(200, "OK", new GetByPrice(title, productDTO), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getById(Integer productId) {
+        BasicResult result = this.validationGetById(productId);
+
+        if (result.getResult()) {
+            Product product = productRepository.findFirstById(productId);
+            ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
+            ArrayList<ProductAssessment> assessments = productAssessmentRepository
+                    .findByProduct_IdOrderByCreatedAtDesc(productId);
+
+            ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
+            photos.forEach((val) -> {
+                String filePhotoName = this.setFilePhotoName(val);
+                String photoLink = this.setPhotoLink(filePhotoName);
+                ProductPhotoDTO dto = new ProductPhotoDTO(val.getId(), photoLink);
+                photoDTOS.add(dto);
+            });
+
+            Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(product.getId());
+            Double rating = this.getRating(this.sumRate(assessments), totalAssessment);
+
+            return new ResponseTemplate(200, "OK",
+                    productMapper.mapToProductDetailDTO(product, photoDTOS, assessments, rating, totalAssessment),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate incrementSeen(IncrementSeenRequest request) {
+        BasicResult result = this.validationIncrementSeen(request);
+
+        if (result.getResult()) {
+            Product product = productRepository.findFirstById(request.getProductId());
+            product.setSeen(product.getSeen() + 1);
+            productRepository.save(product);
+
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
     }
 
     @Override
@@ -161,8 +209,7 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseTemplate(200, "OK", null, null, null);
         }
 
-        return new ResponseTemplate(result.getCode(), result.getStatus(),
-                null, null, result.getError());
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
     }
 
     @Override
@@ -237,19 +284,26 @@ public class ProductServiceImpl implements ProductService {
         Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
         Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
 
-        String filePhotoName = null;
-        if (productPhoto != null) {
-            filePhotoName = productPhoto.getFilename();
-        }
-
-        String photoLink = null;
-        try {
-            photoLink = this.getImage(this.getExtensionFile(filePhotoName), this.getFilename(filePhotoName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String filePhotoName = this.setFilePhotoName(productPhoto);
+        String photoLink = this.setPhotoLink(filePhotoName);
 
         return productMapper.mapToProductGeneralDTO(val, photoLink, rating, totalAssessment);
+    }
+
+    private String setFilePhotoName(ProductPhoto productPhoto) {
+        if (productPhoto != null) {
+            return productPhoto.getFilename();
+        }
+
+        return null;
+    }
+
+    private String setPhotoLink(String filePhotoName) {
+        try {
+            return this.getImage(this.getExtensionFile(filePhotoName), this.getFilename(filePhotoName));
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private Double getRating(Integer sumOfRate, Integer totalAssessment) {
@@ -264,6 +318,26 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return null;
+    }
+
+    private BasicResult validationIncrementSeen(IncrementSeenRequest request) {
+        if (request.getProductId() == null) {
+            return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
+        }
+
+        if (!this.isExistProduct(request.getProductId())) {
+            return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+    private BasicResult validationGetById(Integer productId) {
+        if (!this.isExistProduct(productId)) {
+            return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationGetByCategory(Integer categoryId) {

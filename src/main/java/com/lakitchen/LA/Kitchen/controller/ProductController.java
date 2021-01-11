@@ -3,6 +3,7 @@ package com.lakitchen.LA.Kitchen.controller;
 import com.lakitchen.LA.Kitchen.api.path.ProductPath;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,18 @@ public class ProductController {
     @GetMapping(ProductPath.GET_PRODUCT_BY_PRICE)
     public ResponseTemplate getByPrice(@RequestParam("from") String from) {
         return productService.getByPrice(from);
+    }
+
+    // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_ID)
+    public ResponseTemplate getById(@RequestParam("productId") Integer productId) {
+        return productService.getById(productId);
+    }
+
+    // ROLE_USER
+    @PutMapping(ProductPath.INCREMENT_SEEN)
+    public ResponseTemplate incrementSeen(@RequestBody IncrementSeenRequest objParam) {
+        return productService.incrementSeen(objParam);
     }
 
     // ROLE_ADMIN

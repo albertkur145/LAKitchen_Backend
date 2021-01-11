@@ -10,5 +10,6 @@ public interface ProductAssessmentRepository extends JpaRepository<ProductAssess
 
     Integer countAllByProduct_Id(Integer productId);
     ArrayList<ProductAssessment> findByProduct_Id(Integer productId);
+    ArrayList<ProductAssessment> findByProduct_IdOrderByCreatedAtDesc(Integer productId);
 
 }

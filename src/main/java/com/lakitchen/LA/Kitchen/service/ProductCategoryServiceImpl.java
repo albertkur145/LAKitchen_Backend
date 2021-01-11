@@ -1,8 +1,7 @@
 package com.lakitchen.LA.Kitchen.service;
 
-import com.lakitchen.LA.Kitchen.api.dto.CategoryDTO;
 import com.lakitchen.LA.Kitchen.api.response.data.format.GetCategoriesAndSubFormat;
-import com.lakitchen.LA.Kitchen.api.dto.SubCategoryDTO;
+import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import com.lakitchen.LA.Kitchen.api.response.data.GetCategories;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.data.ProductCategoryData;
@@ -61,7 +60,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 .findAll(Sort.by("name").ascending());
 
         if (!productCategoryList.isEmpty()) {
-            ArrayList<CategoryDTO> categoryDTOS = new ArrayList<>();
+            ArrayList<IdNameDTO> categoryDTOS = new ArrayList<>();
 
             for (ProductCategory val : productCategoryList) {
                 categoryDTOS.add(productCategoryMapper.mapToCategoryDTO(val));
@@ -90,15 +89,15 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
             ArrayList<GetCategoriesAndSubFormat> getCategoriesAndSubFormats = new ArrayList<>();
 
             for (ProductCategory val : productCategoryList) {
-                CategoryDTO categoryDTO = new CategoryDTO(val.getId(), val.getName());
+                IdNameDTO categoryDTO = new IdNameDTO(val.getId(), val.getName());
                 ArrayList<ProductSubCategory> productSubCategoryList
                         = (ArrayList<ProductSubCategory>) productSubCategoryRepository
                         .findByProductCategory_IdOrderByNameAsc(val.getId());
 
-                ArrayList<SubCategoryDTO> subCategoryDTOS = new ArrayList<>();
+                ArrayList<IdNameDTO> subCategoryDTOS = new ArrayList<>();
 
                 for (ProductSubCategory subVal : productSubCategoryList) {
-                    SubCategoryDTO subCategoryDTO = new SubCategoryDTO(subVal.getId(), subVal.getName());
+                    IdNameDTO subCategoryDTO = new IdNameDTO(subVal.getId(), subVal.getName());
                     subCategoryDTOS.add(subCategoryDTO);
                 }
 

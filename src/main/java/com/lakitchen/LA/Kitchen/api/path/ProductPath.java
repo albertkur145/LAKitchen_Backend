@@ -10,6 +10,8 @@ public class ProductPath {
     public static final String GET_PRODUCT_BY_CATEGORY = PRODUCT + "/category";
     public static final String GET_PRODUCT_BY_NAME = PRODUCT + "/name";
     public static final String GET_PRODUCT_BY_PRICE = PRODUCT + "/price";
+    public static final String GET_PRODUCT_BY_ID = PRODUCT + "/id";
+    public static final String INCREMENT_SEEN = PRODUCT + "/seen";
 
     // ROLE_ADMIN ENDPOINT
     private static final String ADMIN_API = API + "/admin/product";

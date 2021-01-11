@@ -1,0 +1,22 @@
+package com.lakitchen.LA.Kitchen.api.dto.role_user.product;
+
+import com.lakitchen.LA.Kitchen.api.dto.ProductAssessmentDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.ArrayList;
+
+@Data
+@AllArgsConstructor
+public class ProductDetailDTO {
+    Integer id;
+    String name;
+    Integer price;
+    String description;
+    Integer seen;
+    Double rating;
+    Integer evaluators;
+    ArrayList<ProductPhotoDTO> photo_links;
+    ArrayList<ProductAssessmentDTO> assessment;
+}

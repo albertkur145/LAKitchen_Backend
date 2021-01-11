@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CategoryDTO {
+public class IdNameDTO {
     Integer id;
     String name;
 }

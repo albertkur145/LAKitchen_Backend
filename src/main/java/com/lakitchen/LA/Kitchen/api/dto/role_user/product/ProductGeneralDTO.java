@@ -9,7 +9,7 @@ public class ProductGeneralDTO {
     Integer id;
     String name;
     Integer price;
-    String photoLink;
+    String photo_link;
     Double rating;
     Integer evaluators;
 }

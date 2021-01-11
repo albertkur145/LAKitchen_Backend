@@ -1,7 +1,6 @@
 package com.lakitchen.LA.Kitchen.api.response.data.format;
 
-import com.lakitchen.LA.Kitchen.api.dto.CategoryDTO;
-import com.lakitchen.LA.Kitchen.api.dto.SubCategoryDTO;
+import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +11,5 @@ import java.util.ArrayList;
 public class GetCategoriesAndSubFormat {
     Integer id;
     String name;
-    ArrayList<SubCategoryDTO> subCategories;
+    ArrayList<IdNameDTO> subCategories;
 }
