@@ -1,8 +1,10 @@
 package com.lakitchen.LA.Kitchen.api.path;
 
+import com.lakitchen.LA.Kitchen.api.path.config.ApiConfig;
+
 public class ProductCategoryPath {
 
-    private static final String API = "/api";
+    private static final String API = ApiConfig.API;
 
     // PRODUCT CATEGORY ENDPOINTS
     private static final String CATEGORY = API + "/categories";

@@ -1,8 +1,11 @@
 package com.lakitchen.LA.Kitchen.api.path;
 
+import com.lakitchen.LA.Kitchen.api.path.config.ApiConfig;
+
 public class ProductPath {
 
-    private static final String API = "/api";
+    private static final String API = ApiConfig.API;
+    private static final String ADMIN_API = ApiConfig.ADMIN;
 
     // ROLE_USER ENDPOINT
     private static final String PRODUCT = API + "/product";
@@ -14,9 +17,9 @@ public class ProductPath {
     public static final String INCREMENT_SEEN = PRODUCT + "/seen";
 
     // ROLE_ADMIN ENDPOINT
-    private static final String ADMIN_API = API + "/admin/product";
-    public static final String ADMIN_PRODUCT_POST = ADMIN_API + "";
-    public static final String ADMIN_PRODUCT_PUT = ADMIN_API + "";
-    public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_API + "/upload";
+    private static final String ADMIN_PRODUCT = ADMIN_API + "/product";
+    public static final String ADMIN_PRODUCT_POST = ADMIN_PRODUCT + "";
+    public static final String ADMIN_PRODUCT_PUT = ADMIN_PRODUCT + "";
+    public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_PRODUCT + "/upload";
 
 }

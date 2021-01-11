@@ -1,10 +1,8 @@
 package com.lakitchen.LA.Kitchen.service;
 
 
-import com.lakitchen.LA.Kitchen.api.dto.ProductAssessmentDTO;
 import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
-import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductDetailDTO;
-import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
@@ -19,23 +17,17 @@ import com.lakitchen.LA.Kitchen.repository.*;
 import com.lakitchen.LA.Kitchen.service.impl.ProductService;
 import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
-import org.apache.commons.io.IOUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -63,8 +55,6 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductMapper productMapper;
 
-    private String projectDir = "D:/project/LA Kitchen/Backend/src/uploads/";
-
     @Override
     public ResponseTemplate getBySubCategory(Integer subCategoryId) {
         BasicResult result = this.validationGetBySubCategory(subCategoryId);
@@ -76,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
             ProductSubCategory subCategory = productSubCategoryRepository.findFirstById(subCategoryId);
 
             products.forEach((val) -> {
-                ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+                ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
                 productDTO.add(dto);
             });
 
@@ -98,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
             ProductCategory category = productCategoryRepository.findFirstById(categoryId);
 
             products.forEach((val) -> {
-                ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+                ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
                 productDTO.add(dto);
             });
 
@@ -117,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
         ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
 
         products.forEach((val) -> {
-            ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+            ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
             productDTO.add(dto);
         });
 
@@ -131,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
         ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
 
         products.forEach((val) -> {
-            ProductGeneralDTO dto = this.setToFormatGeneralDTO(val);
+            ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
             productDTO.add(dto);
         });
 
@@ -150,14 +140,14 @@ public class ProductServiceImpl implements ProductService {
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {
-                String filePhotoName = this.setFilePhotoName(val);
-                String photoLink = this.setPhotoLink(filePhotoName);
+                String filePhotoName = productMapper.setFilePhotoName(val);
+                String photoLink = productMapper.setPhotoLink(filePhotoName);
                 ProductPhotoDTO dto = new ProductPhotoDTO(val.getId(), photoLink);
                 photoDTOS.add(dto);
             });
 
             Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(product.getId());
-            Double rating = this.getRating(this.sumRate(assessments), totalAssessment);
+            Double rating = productMapper.getRating(productMapper.sumRate(assessments), totalAssessment);
 
             return new ResponseTemplate(200, "OK",
                     productMapper.mapToProductDetailDTO(product, photoDTOS, assessments, rating, totalAssessment),
@@ -190,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
             files.forEach((file) -> {
                 String uuid = UUID.randomUUID().toString();
                 String filename = StringUtils.cleanPath(file.getOriginalFilename());
-                String ext = this.getExtensionFile(filename);
+                String ext = productMapper.getExtensionFile(filename);
 
                 filename = uuid + "." + ext;
 
@@ -200,7 +190,7 @@ public class ProductServiceImpl implements ProductService {
                 productPhotoRepository.save(productPhoto);
 
                 try {
-                    this.saveFile(projectDir, filename, file);
+                    this.saveFile(productMapper.getProjectDir(), filename, file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -275,49 +265,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productRepository.findAllByDeletedAtOrderByPriceDesc(null);
-    }
-
-    private ProductGeneralDTO setToFormatGeneralDTO(Product val) {
-        ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(val.getId());
-        ArrayList<ProductAssessment> productAssessments = productAssessmentRepository
-                .findByProduct_Id(val.getId());
-        Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
-        Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
-
-        String filePhotoName = this.setFilePhotoName(productPhoto);
-        String photoLink = this.setPhotoLink(filePhotoName);
-
-        return productMapper.mapToProductGeneralDTO(val, photoLink, rating, totalAssessment);
-    }
-
-    private String setFilePhotoName(ProductPhoto productPhoto) {
-        if (productPhoto != null) {
-            return productPhoto.getFilename();
-        }
-
-        return null;
-    }
-
-    private String setPhotoLink(String filePhotoName) {
-        try {
-            return this.getImage(this.getExtensionFile(filePhotoName), this.getFilename(filePhotoName));
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    private Double getRating(Integer sumOfRate, Integer totalAssessment) {
-        if (totalAssessment > 0) {
-            DecimalFormat df = new DecimalFormat("#.##");
-            DecimalFormatSymbols sys = new DecimalFormatSymbols();
-            sys.setDecimalSeparator('.');
-            df.setDecimalFormatSymbols(sys);
-            df.setRoundingMode(RoundingMode.DOWN);
-
-            return Double.valueOf(df.format((double) sumOfRate / totalAssessment));
-        }
-
-        return null;
     }
 
     private BasicResult validationIncrementSeen(IncrementSeenRequest request) {
@@ -398,16 +345,6 @@ public class ProductServiceImpl implements ProductService {
         return new BasicResult(true, null, "OK", 200);
     }
 
-    private Integer sumRate(ArrayList<ProductAssessment> productAssessments) {
-        final int[] rate = {0};
-
-        productAssessments.forEach((val) -> {
-            rate[0] = (int) (rate[0] + val.getRate());
-        });
-
-        return rate[0];
-    }
-
     private Boolean isExistCategory(Integer id) {
         return productCategoryRepository.findFirstById(id) != null;
     }
@@ -418,44 +355,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Boolean isExistProduct(Integer id) {
         return productRepository.findFirstById(id) != null;
-    }
-
-    private byte[] getImageWithMediaType(String imageName) throws IOException {
-        Path destination = Paths.get(projectDir + imageName);
-        return IOUtils.toByteArray(destination.toUri());
-    }
-
-    private String getImage(String ext, String filename) throws IOException {
-        if (ext != null && filename != null) {
-            byte[] bytes =  this.getImageWithMediaType(filename + "." + ext);
-
-            StringBuilder builder = new StringBuilder();
-            builder.append("data:image/" + ext + ";base64,");
-            builder.append(org.apache.tomcat.util.codec.binary
-                    .StringUtils.newStringUtf8(Base64.encodeBase64(bytes, false)));
-
-            return builder.toString();
-        }
-
-        return null;
-    }
-
-    private String getExtensionFile(String filename) {
-        if (filename != null) {
-            String[] split = filename.split("\\.");
-            return split[split.length - 1].toLowerCase();
-        }
-
-        return null;
-    }
-
-    private String getFilename(String filename) {
-        if (filename != null) {
-            String[] split = filename.split("\\.");
-            return split[0];
-        }
-
-        return null;
     }
 
     private void saveFile(String uploadDir, String filename, MultipartFile file) throws IOException {

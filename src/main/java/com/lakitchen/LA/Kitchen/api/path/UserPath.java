@@ -1,8 +1,10 @@
 package com.lakitchen.LA.Kitchen.api.path;
 
+import com.lakitchen.LA.Kitchen.api.path.config.ApiConfig;
+
 public class UserPath {
 
-    private static final String API = "/api";
+    private static final String API = ApiConfig.API;
 
     // ROLE_USER ENDPOINTS
     private static final String USER = API + "/user";

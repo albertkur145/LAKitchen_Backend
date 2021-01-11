@@ -1,6 +1,6 @@
 package com.lakitchen.LA.Kitchen.api.response.data.role_user.product;
 
-import com.lakitchen.LA.Kitchen.api.dto.role_user.product.ProductGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

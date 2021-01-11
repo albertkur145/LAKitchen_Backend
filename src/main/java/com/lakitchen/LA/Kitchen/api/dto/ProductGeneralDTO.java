@@ -1,4 +1,4 @@
-package com.lakitchen.LA.Kitchen.api.dto.role_user.product;
+package com.lakitchen.LA.Kitchen.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

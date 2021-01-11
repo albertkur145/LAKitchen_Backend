@@ -10,19 +10,21 @@ import java.sql.Timestamp;
 @Entity
 @Data
 @Table(name = WishlistConstant.TABLE_NAME, uniqueConstraints = {
-        @UniqueConstraint(columnNames = WishlistConstant.USER_ID),
-        @UniqueConstraint(columnNames = WishlistConstant.PRODUCT_ID)
+        @UniqueConstraint(columnNames = WishlistConstant.ID)
 })
 public class Wishlist implements Serializable {
 
-    @JsonIgnore
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = WishlistConstant.ID)
+    private Integer id;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = WishlistConstant.USER_ID)
     private User user;
 
     @JsonIgnore
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = WishlistConstant.PRODUCT_ID)
     private Product product;
