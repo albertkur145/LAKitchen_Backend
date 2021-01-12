@@ -1,10 +1,7 @@
 package com.lakitchen.LA.Kitchen.service.mapper;
 
-import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductAssessmentDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductDetailDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.*;
+import com.lakitchen.LA.Kitchen.model.entity.Cart;
 import com.lakitchen.LA.Kitchen.model.entity.Product;
 import com.lakitchen.LA.Kitchen.model.entity.ProductAssessment;
 import com.lakitchen.LA.Kitchen.model.entity.ProductPhoto;
@@ -29,13 +26,13 @@ import java.util.ArrayList;
 public class ProductMapper {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ProductPhotoRepository productPhotoRepository;
+    private ProductPhotoRepository productPhotoRepository;
 
     @Autowired
-    ProductAssessmentRepository productAssessmentRepository;
+    private ProductAssessmentRepository productAssessmentRepository;
 
     private String projectDir = "D:/project/LA Kitchen/Backend/src/uploads/";
 
@@ -43,7 +40,7 @@ public class ProductMapper {
         return this.projectDir;
     }
 
-    public ProductGeneralDTO mapToProductGeneralDTO(Product product, String photoLink, Double rating, Integer totalAssessment) {
+    private ProductGeneralDTO mapToProductGeneralDTO(Product product, String photoLink, Double rating, Integer totalAssessment) {
         return new ProductGeneralDTO(
                 product.getId(),
                 product.getName(),
@@ -82,15 +79,23 @@ public class ProductMapper {
         );
     }
 
+    public ProductCartDTO mapToProductCartDTO(Product product, Cart cart) {
+        return new ProductCartDTO(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                getPhotoLink(product.getId()),
+                cart.getQuantity(),
+                cart.getNote()
+        );
+    }
+
     public ProductGeneralDTO setToFormatGeneralDTO(Product val) {
-        ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(val.getId());
         ArrayList<ProductAssessment> productAssessments = productAssessmentRepository
                 .findByProduct_Id(val.getId());
         Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
         Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
-
-        String filePhotoName = this.setFilePhotoName(productPhoto);
-        String photoLink = this.setPhotoLink(filePhotoName);
+        String photoLink = this.getPhotoLink(val.getId());
 
         return this.mapToProductGeneralDTO(val, photoLink, rating, totalAssessment);
     }
@@ -101,6 +106,12 @@ public class ProductMapper {
         }
 
         return null;
+    }
+
+    public String getPhotoLink(Integer productId) {
+        ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(productId);
+        String filePhotoName = this.setFilePhotoName(productPhoto);
+        return this.setPhotoLink(filePhotoName);
     }
 
     public String setPhotoLink(String filePhotoName) {

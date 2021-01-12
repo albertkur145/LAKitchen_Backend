@@ -1,7 +1,7 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.WishlistPath;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveWishlistRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.WishlistServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class WishlistController {
     WishlistServiceImpl wishlistService;
 
     @PostMapping(WishlistPath.WISHLIST_POST)
-    public ResponseTemplate saveProductWishlist(@RequestBody SaveRequest objParam) {
+    public ResponseTemplate saveProductWishlist(@RequestBody SaveWishlistRequest objParam) {
         return wishlistService.saveProductWishlist(objParam);
     }
 

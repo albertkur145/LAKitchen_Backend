@@ -10,6 +10,7 @@ import com.lakitchen.LA.Kitchen.model.entity.UserStatus;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
 import com.lakitchen.LA.Kitchen.repository.UserRoleRepository;
 import com.lakitchen.LA.Kitchen.repository.UserStatusRepository;
+import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.UserService;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRoleRepository userRoleRepository;
 
+    @Autowired
+    private Func FUNC;
+
     @Override
     public ResponseTemplate register(RegisterRequest request) {
         BasicResult result = this.validationRegister(request);
@@ -42,7 +46,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(request.getEmail());
             user.setPassword(this.BCryptEncoder(request.getPassword()));
             user.setPhoneNumber(request.getPhoneNumber());
-            user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            user.setCreatedAt(FUNC.getCurrentTimestamp());
 
             userRepository.save(user);
 
@@ -65,7 +69,7 @@ public class UserServiceImpl implements UserService {
             user.setAddress(request.getAddress());
             user.setProvince(request.getProvince());
             user.setCity(request.getCity());
-            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            user.setUpdatedAt(FUNC.getCurrentTimestamp());
 
             userRepository.save(user);
 
@@ -84,7 +88,7 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.findFirstById(request.getId());
 
             user.setPassword(this.BCryptEncoder(request.getNewPassword()));
-            user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            user.setUpdatedAt(FUNC.getCurrentTimestamp());
 
             userRepository.save(user);
 
@@ -124,10 +128,6 @@ public class UserServiceImpl implements UserService {
 
     private Boolean isExistPhoneNumber(String phoneNumber) {
         return userRepository.findFirstByPhoneNumber(phoneNumber) != null;
-    }
-
-    private Boolean isExistUser(Integer id) {
-        return userRepository.findFirstById(id) != null;
     }
 
     private Boolean isExistPhoneNumberOther(Integer id, String phoneNumber) {
@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
             return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
-        if (!this.isExistUser(request.getId())) {
+        if (!FUNC.isExistUser(request.getId())) {
             return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 
@@ -195,7 +195,7 @@ public class UserServiceImpl implements UserService {
             return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
-        if (!this.isExistUser(request.getId())) {
+        if (!FUNC.isExistUser(request.getId())) {
             return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 

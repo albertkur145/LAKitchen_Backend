@@ -1,37 +1,40 @@
 package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveWishlistRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.wishlist.GetByUserId;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
+import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.WishlistService;
 import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Service
 public class WishlistServiceImpl implements WishlistService {
 
     @Autowired
-    WishlistRepository wishlistRepository;
+    private WishlistRepository wishlistRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    ProductMapper productMapper;
+    private ProductMapper productMapper;
+
+    @Autowired
+    private Func FUNC;
 
     @Override
-    public ResponseTemplate saveProductWishlist(SaveRequest request) {
+    public ResponseTemplate saveProductWishlist(SaveWishlistRequest request) {
         BasicResult result = this.validationSaveProductWishlist(request);
 
         if (result.getResult()) {
@@ -41,7 +44,7 @@ public class WishlistServiceImpl implements WishlistService {
 
             wishlist.setUser(user);
             wishlist.setProduct(product);
-            wishlist.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            wishlist.setCreatedAt(FUNC.getCurrentTimestamp());
             wishlistRepository.save(wishlist);
 
             return new ResponseTemplate(200, "OK",null, null, null);
@@ -79,12 +82,12 @@ public class WishlistServiceImpl implements WishlistService {
         return new ResponseTemplate(result.getCode(), result.getStatus(),null, null, result.getError());
     }
 
-    private BasicResult validationSaveProductWishlist(SaveRequest request) {
-        if (!this.isExistUser(request.getUserId())) {
+    private BasicResult validationSaveProductWishlist(SaveWishlistRequest request) {
+        if (!FUNC.isExistUser(request.getUserId())) {
             return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 
-        if (!this.isExistProduct(request.getProductId())) {
+        if (!FUNC.isExistProduct(request.getProductId())) {
             return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
         }
 
@@ -104,19 +107,11 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     private BasicResult validationGetAll(Integer userId) {
-        if (!this.isExistUser(userId)) {
+        if (!FUNC.isExistUser(userId)) {
             return new BasicResult(false, "User tidak ditemukan", "NOT FOUND", 404);
         }
 
         return new BasicResult(true, null, "OK", 200);
-    }
-
-    private Boolean isExistUser(Integer id) {
-        return userRepository.findFirstById(id) != null;
-    }
-
-    private Boolean isExistProduct(Integer id) {
-        return productRepository.findFirstById(id) != null;
     }
 
     private Boolean isExistWishlist(Integer userId, Integer productId) {

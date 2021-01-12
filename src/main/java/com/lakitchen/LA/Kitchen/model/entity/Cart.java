@@ -10,19 +10,21 @@ import java.sql.Timestamp;
 @Entity
 @Data
 @Table(name = CartConstant.TABLE_NAME, uniqueConstraints = {
-        @UniqueConstraint(columnNames = CartConstant.USER_ID),
-        @UniqueConstraint(columnNames = CartConstant.PRODUCT_ID)
+        @UniqueConstraint(columnNames = CartConstant.ID)
 })
 public class Cart implements Serializable {
 
-    @JsonIgnore
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = CartConstant.ID)
+    private Integer id;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CartConstant.USER_ID)
     private User user;
 
     @JsonIgnore
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CartConstant.PRODUCT_ID)
     private Product product;

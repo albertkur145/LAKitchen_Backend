@@ -14,6 +14,7 @@ import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByPrice;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetBySubCategory;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
+import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.ProductService;
 import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
@@ -54,6 +55,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private Func FUNC;
 
     @Override
     public ResponseTemplate getBySubCategory(Integer subCategoryId) {
@@ -217,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(request.getPrice());
             product.setProductSubCategory(subCategory);
             product.setDescription(request.getDescription());
-            product.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            product.setCreatedAt(FUNC.getCurrentTimestamp());
             Product productSaved = productRepository.save(product);
 
             return new ResponseTemplate(200, "OK",
@@ -240,7 +244,7 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(request.getPrice());
             product.setProductSubCategory(subCategory);
             product.setDescription(request.getDescription());
-            product.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            product.setUpdatedAt(FUNC.getCurrentTimestamp());
             productRepository.save(product);
 
             return new ResponseTemplate(200, "OK",
@@ -272,7 +276,7 @@ public class ProductServiceImpl implements ProductService {
             return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
-        if (!this.isExistProduct(request.getProductId())) {
+        if (!FUNC.isExistProduct(request.getProductId())) {
             return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
         }
 
@@ -280,7 +284,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private BasicResult validationGetById(Integer productId) {
-        if (!this.isExistProduct(productId)) {
+        if (!FUNC.isExistProduct(productId)) {
             return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
         }
 
@@ -309,7 +313,7 @@ public class ProductServiceImpl implements ProductService {
             return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
-        if (!this.isExistProduct(request.getId())) {
+        if (!FUNC.isExistProduct(request.getId())) {
             return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
         }
 
@@ -338,8 +342,8 @@ public class ProductServiceImpl implements ProductService {
             return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
         }
 
-        if (!this.isExistProduct(productId)) {
-            return new BasicResult(false, "Product tidak ditemukan", "NOT FOUND", 404);
+        if (!FUNC.isExistProduct(productId)) {
+            return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
         }
 
         return new BasicResult(true, null, "OK", 200);
@@ -351,10 +355,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Boolean isExistSubCategory(Integer id) {
         return productSubCategoryRepository.findFirstById(id) != null;
-    }
-
-    private Boolean isExistProduct(Integer id) {
-        return productRepository.findFirstById(id) != null;
     }
 
     private void saveFile(String uploadDir, String filename, MultipartFile file) throws IOException {
