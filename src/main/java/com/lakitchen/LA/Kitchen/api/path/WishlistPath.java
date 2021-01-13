@@ -6,7 +6,7 @@ public class WishlistPath {
 
     private static final String API = ApiConfig.API;
 
-    // ROLE_USER
+    // ROLE_USER ENDPOINT
     private static final String WISHLIST = API + "/wishlist";
     public static final String WISHLIST_POST = WISHLIST + "";
     public static final String WISHLIST_DELETE = WISHLIST + "";

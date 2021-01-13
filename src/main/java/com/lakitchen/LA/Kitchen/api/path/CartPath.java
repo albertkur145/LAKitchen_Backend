@@ -6,6 +6,7 @@ public class CartPath {
 
     private static final String API = ApiConfig.API;
 
+    // ROLE_USER ENDPOINT
     private static final String CART = API + "/cart";
     public static final String CART_POST = CART + "";
     public static final String CART_PUT = CART + "";

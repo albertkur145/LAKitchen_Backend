@@ -6,7 +6,7 @@ public class UserPath {
 
     private static final String API = ApiConfig.API;
 
-    // ROLE_USER ENDPOINTS
+    // ROLE_USER ENDPOINT
     private static final String USER = API + "/user";
     public static final String USER_POST = USER + "";
     public static final String USER_PUT = USER + "";
