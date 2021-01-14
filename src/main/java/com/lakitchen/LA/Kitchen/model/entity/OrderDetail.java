@@ -9,19 +9,21 @@ import java.io.Serializable;
 @Entity
 @Data
 @Table(name = OrderDetailConstant.TABLE_NAME, uniqueConstraints = {
-        @UniqueConstraint(columnNames = OrderDetailConstant.ORDER_NUMBER),
-        @UniqueConstraint(columnNames = OrderDetailConstant.PRODUCT_ID)
+        @UniqueConstraint(columnNames = OrderDetailConstant.ID)
 })
 public class OrderDetail implements Serializable {
 
-    @JsonIgnore
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = OrderDetailConstant.ID)
+    private Integer id;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderDetailConstant.ORDER_NUMBER)
     private Order order;
 
     @JsonIgnore
-    @Id
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderDetailConstant.PRODUCT_ID)
     private Product product;
@@ -39,5 +41,5 @@ public class OrderDetail implements Serializable {
     private Integer subTotal;
 
     @Column(name = OrderDetailConstant.IS_ASSESSMENT)
-    private Boolean isAssessment;
+    private Integer isAssessment;
 }

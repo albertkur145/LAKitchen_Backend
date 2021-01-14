@@ -9,5 +9,6 @@ public class OrderPath {
     // ROLE_USER
     private static final String ORDER = API + "/order";
     public static final String ORDER_POST = ORDER + "";
+    public static final String ORDER_GET_ALL = ORDER + "";
 
 }

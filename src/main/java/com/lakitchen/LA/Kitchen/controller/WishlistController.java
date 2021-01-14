@@ -15,17 +15,20 @@ public class WishlistController {
     @Autowired
     WishlistServiceImpl wishlistService;
 
+    // ROLE_USER
     @PostMapping(WishlistPath.WISHLIST_POST)
     public ResponseTemplate saveProductWishlist(@RequestBody SaveWishlistRequest objParam) {
         return wishlistService.saveProductWishlist(objParam);
     }
 
+    // ROLE_USER
     @DeleteMapping(WishlistPath.WISHLIST_DELETE)
     public ResponseTemplate removeWishlist(@RequestParam("userId") Integer userId,
                                            @RequestParam("productId") Integer productId) {
         return wishlistService.removeWishlist(userId, productId);
     }
 
+    // ROLE_USER
     @GetMapping(WishlistPath.WISHLIST_GET_ALL)
     public ResponseTemplate getAll(@RequestParam("userId") Integer userId) {
         return wishlistService.getAll(userId);

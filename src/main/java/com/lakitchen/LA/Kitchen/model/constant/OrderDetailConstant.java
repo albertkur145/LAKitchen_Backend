@@ -2,6 +2,7 @@ package com.lakitchen.LA.Kitchen.model.constant;
 
 public class OrderDetailConstant {
     public static final String TABLE_NAME = "order_detail";
+    public static final String ID = "id";
     public static final String ORDER_NUMBER = "order_number";
     public static final String PRODUCT_ID = "product_id";
     public static final String PRICE = "price";

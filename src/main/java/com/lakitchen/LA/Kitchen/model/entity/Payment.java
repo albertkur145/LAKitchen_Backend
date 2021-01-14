@@ -10,12 +10,17 @@ import java.sql.Timestamp;
 @Entity
 @Data
 @Table(name = PaymentConstant.TABLE_NAME, uniqueConstraints = {
+        @UniqueConstraint(columnNames = PaymentConstant.ID),
         @UniqueConstraint(columnNames = PaymentConstant.ORDER_NUMBER)
 })
 public class Payment implements Serializable {
 
-    @JsonIgnore
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = PaymentConstant.ID)
+    private Integer id;
+
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = PaymentConstant.ORDER_NUMBER)
     private Order order;

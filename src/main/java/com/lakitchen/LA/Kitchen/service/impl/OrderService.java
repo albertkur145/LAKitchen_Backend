@@ -6,5 +6,6 @@ import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 public interface OrderService {
 
     ResponseTemplate saveOrder(SaveOrderRequest request);
+    ResponseTemplate getAllOrder(Integer userId);
 
 }
