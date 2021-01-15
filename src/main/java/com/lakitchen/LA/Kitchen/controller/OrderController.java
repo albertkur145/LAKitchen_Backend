@@ -27,4 +27,23 @@ public class OrderController {
         return orderService.getAllOrder(userId);
     }
 
+    // ROLE_USER
+    @GetMapping(OrderPath.ORDER_GET_BY_ORDER_NUMBER)
+    public ResponseTemplate getDetailByOrderNumber(@RequestParam("orderNumber") String orderNumber) {
+        return orderService.getDetailByOrderNumber(orderNumber);
+    }
+
+    // ROLE_USER
+    @GetMapping(OrderPath.ORDER_GET_FOR_ASSESSMENT)
+    public ResponseTemplate getForAssessment(@RequestParam("orderNumber") String orderNumber,
+                                             @RequestParam("productId") Integer productId) {
+        return orderService.getForAssessment(orderNumber, productId);
+    }
+
+    // ROLE_USER
+    @DeleteMapping(OrderPath.ORDER_DELETE)
+    public ResponseTemplate cancelOrder(@RequestParam("orderNumber") String orderNumber) {
+        return orderService.cancelOrder(orderNumber);
+    }
+
 }

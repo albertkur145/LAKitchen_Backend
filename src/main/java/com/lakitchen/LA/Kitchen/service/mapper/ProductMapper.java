@@ -1,10 +1,7 @@
 package com.lakitchen.LA.Kitchen.service.mapper;
 
 import com.lakitchen.LA.Kitchen.api.dto.*;
-import com.lakitchen.LA.Kitchen.model.entity.Cart;
-import com.lakitchen.LA.Kitchen.model.entity.Product;
-import com.lakitchen.LA.Kitchen.model.entity.ProductAssessment;
-import com.lakitchen.LA.Kitchen.model.entity.ProductPhoto;
+import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.ProductAssessmentRepository;
 import com.lakitchen.LA.Kitchen.repository.ProductPhotoRepository;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
@@ -84,9 +81,17 @@ public class ProductMapper {
                 product.getId(),
                 product.getName(),
                 product.getPrice(),
-                getPhotoLink(product.getId()),
+                this.getPhotoLink(product.getId()),
                 cart.getQuantity(),
                 cart.getNote()
+        );
+    }
+
+    public ProductSimplifiedDTO mapToProductSimplifiedDTO(Product product) {
+        return new ProductSimplifiedDTO(
+                product.getId(),
+                product.getName(),
+                this.getPhotoLink(product.getId())
         );
     }
 

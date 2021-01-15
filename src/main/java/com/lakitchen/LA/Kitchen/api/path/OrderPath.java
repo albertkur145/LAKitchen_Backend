@@ -9,6 +9,9 @@ public class OrderPath {
     // ROLE_USER
     private static final String ORDER = API + "/order";
     public static final String ORDER_POST = ORDER + "";
+    public static final String ORDER_DELETE = ORDER + "";
     public static final String ORDER_GET_ALL = ORDER + "";
+    public static final String ORDER_GET_BY_ORDER_NUMBER = ORDER + "/id";
+    public static final String ORDER_GET_FOR_ASSESSMENT = ORDER + "/productdetail";
 
 }

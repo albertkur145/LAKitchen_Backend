@@ -7,5 +7,8 @@ public interface OrderService {
 
     ResponseTemplate saveOrder(SaveOrderRequest request);
     ResponseTemplate getAllOrder(Integer userId);
+    ResponseTemplate getDetailByOrderNumber(String orderNumber);
+    ResponseTemplate getForAssessment(String orderNumber, Integer productId);
+    ResponseTemplate cancelOrder(String orderNumber);
 
 }

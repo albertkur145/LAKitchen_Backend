@@ -1,15 +1,21 @@
 package com.lakitchen.LA.Kitchen.service;
 
+import com.lakitchen.LA.Kitchen.api.dto.OrderDetailDTO;
 import com.lakitchen.LA.Kitchen.api.dto.OrderGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductOrderDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductSimplifiedDTO;
 import com.lakitchen.LA.Kitchen.api.requestbody.user.order.SaveOrderRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.user.order.helper.ProductHelper;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
-import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetById;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetByUserId;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetDetailByNumber;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetForAssessment;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
 import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.OrderService;
 import com.lakitchen.LA.Kitchen.service.mapper.OrderMapper;
+import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +52,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     OrderMapper orderMapper;
+
+    @Autowired
+    ProductMapper productMapper;
 
     @Autowired
     Func FUNC;
@@ -101,15 +110,102 @@ public class OrderServiceImpl implements OrderService {
 
             ArrayList<OrderGeneralDTO> dtos = new ArrayList<>();
             orders.forEach((val) -> {
-                OrderStatus status = orderStatusRepository.findFirstById(val.getOrderStatus().getId());
                 Payment payment = paymentRepository.findFirstByOrder_OrderNumber(val.getOrderNumber());
-                dtos.add(orderMapper.mapToOrderGeneralDTO(val, payment, status));
+                dtos.add(orderMapper.mapToOrderGeneralDTO(val, payment, val.getOrderStatus()));
             });
 
-            return new ResponseTemplate(200, "OK", new GetById(dtos), null, null);
+            return new ResponseTemplate(200, "OK", new GetByUserId(dtos), null, null);
         }
 
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getDetailByOrderNumber(String orderNumber) {
+        BasicResult result = this.validationGetDetailByOrderNumber(orderNumber);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(orderNumber);
+            Payment payment = paymentRepository.findFirstByOrder_OrderNumber(orderNumber);
+            ArrayList<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderNumber(orderNumber);
+
+            ArrayList<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
+            orderDetails.forEach((val) -> {
+                productOrderDTOS.add(orderMapper.mapToProductOrderDTO(val));
+            });
+            return new ResponseTemplate(200, "OK",
+                    new GetDetailByNumber(orderMapper.mapToOrderDetailDTO(order,
+                            payment, order.getOrderStatus(), productOrderDTOS)),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getForAssessment(String orderNumber, Integer productId) {
+        BasicResult result = this.validationGetForAssessment(orderNumber, productId);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(orderNumber);
+            Product product = productRepository.findFirstById(productId);
+            ProductSimplifiedDTO productDTO = productMapper.mapToProductSimplifiedDTO(product);
+
+            return new ResponseTemplate(200, "OK",
+                    new GetForAssessment(order.getOrderNumber(),
+                            FUNC.getFormatDateIndonesian(order.getCreatedAt()), productDTO),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate cancelOrder(String orderNumber) {
+        BasicResult result = this.validationCancelOrder(orderNumber);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(orderNumber);
+            OrderStatus orderStatus = orderStatusRepository.findFirstById(6);
+            order.setOrderStatus(orderStatus);
+            orderRepository.save(order);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    private BasicResult validationCancelOrder(String orderNumber) {
+        if (!this.isExistOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        if (!this.isUnprocessedOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak dapat dibatalkan", "NOT ACCEPTABLE", 406);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+
+    private BasicResult validationGetForAssessment(String orderNumber, Integer productId) {
+        if (!this.isExistOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        if (!FUNC.isExistProduct(productId)) {
+            return new BasicResult(false, "Produk tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+
+    private BasicResult validationGetDetailByOrderNumber(String orderNumber) {
+        if (!this.isExistOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationGetAllOrder(Integer userId) {
@@ -148,6 +244,10 @@ public class OrderServiceImpl implements OrderService {
 
     private Boolean isExistOrder(String orderNumber) {
         return orderRepository.findFirstByOrderNumber(orderNumber) != null;
+    }
+
+    private Boolean isUnprocessedOrder(String orderNumber) {
+        return orderRepository.findFirstByOrderNumberAndOrderStatus_Id(orderNumber, 1) != null;
     }
 
     private String setOrderNumber() {

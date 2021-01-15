@@ -1,13 +1,11 @@
 package com.lakitchen.LA.Kitchen.api.response.data.role_user.order;
 
-import com.lakitchen.LA.Kitchen.api.dto.OrderGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.OrderDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-
 @Data
 @AllArgsConstructor
-public class GetById {
-    ArrayList<OrderGeneralDTO> orders;
+public class GetDetailByNumber {
+    OrderDetailDTO order;
 }
