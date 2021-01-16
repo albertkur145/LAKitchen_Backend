@@ -1,9 +1,9 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.ProductPath;
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

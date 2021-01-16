@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 
@@ -29,6 +30,16 @@ public class Func {
 
     public Timestamp getCurrentTimestamp() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    public String getFormatDateSlash(Timestamp param) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return dateFormat.format(param);
+    }
+
+    public String getFormatDateSimplified(Timestamp param) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
+        return dateFormat.format(param);
     }
 
     public String getFormatDateIndonesian(Timestamp param) {

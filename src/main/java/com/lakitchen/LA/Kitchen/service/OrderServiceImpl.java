@@ -1,12 +1,10 @@
 package com.lakitchen.LA.Kitchen.service;
 
-import com.lakitchen.LA.Kitchen.api.dto.OrderDetailDTO;
-import com.lakitchen.LA.Kitchen.api.dto.OrderGeneralDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductOrderDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductSimplifiedDTO;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.order.SaveOrderRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.order.helper.ProductHelper;
+import com.lakitchen.LA.Kitchen.api.dto.*;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.SaveOrderRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.helper.ProductHelper;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetAllForAssessment;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetByUserId;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetDetailByNumber;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetForAssessment;
@@ -175,6 +173,36 @@ public class OrderServiceImpl implements OrderService {
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
     }
 
+    @Override
+    public ResponseTemplate getAllForAssessment(String orderNumber) {
+        BasicResult result = this.validationGetAllForAssessment(orderNumber);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(orderNumber);
+            Payment payment = paymentRepository.findFirstByOrder_OrderNumber(orderNumber);
+            ArrayList<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderNumber(orderNumber);
+            ArrayList<ProductOrder2DTO> productDTOS = new ArrayList<>();
+            OrderGeneralDTO orderDTO = orderMapper.mapToOrderGeneralDTO(order, payment, order.getOrderStatus());
+
+            orderDetails.forEach((val) -> {
+                productDTOS.add(productMapper.mapToProductOrder2DTO(val));
+            });
+
+            return new ResponseTemplate(200, "OK",
+                    new GetAllForAssessment(orderDTO, productDTOS),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    private BasicResult validationGetAllForAssessment(String orderNumber) {
+        if (!this.isFinishedOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
+    }
+
     private BasicResult validationCancelOrder(String orderNumber) {
         if (!this.isExistOrder(orderNumber)) {
             return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
@@ -248,6 +276,10 @@ public class OrderServiceImpl implements OrderService {
 
     private Boolean isUnprocessedOrder(String orderNumber) {
         return orderRepository.findFirstByOrderNumberAndOrderStatus_Id(orderNumber, 1) != null;
+    }
+
+    private Boolean isFinishedOrder(String orderNumber) {
+        return orderRepository.findFirstByOrderNumberAndOrderStatus_Id(orderNumber, 5) != null;
     }
 
     private String setOrderNumber() {

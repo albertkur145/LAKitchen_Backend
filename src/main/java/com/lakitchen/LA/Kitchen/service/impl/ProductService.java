@@ -1,8 +1,8 @@
 package com.lakitchen.LA.Kitchen.service.impl;
 
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import org.springframework.web.multipart.MultipartFile;
 

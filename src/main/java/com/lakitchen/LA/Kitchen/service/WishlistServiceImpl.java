@@ -1,7 +1,7 @@
 package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveWishlistRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.wishlist.SaveWishlistRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.wishlist.GetByUserId;
 import com.lakitchen.LA.Kitchen.model.entity.*;

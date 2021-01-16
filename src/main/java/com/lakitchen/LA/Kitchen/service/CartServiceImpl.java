@@ -1,9 +1,8 @@
 package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.dto.ProductCartDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.SaveCartRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.UpdateCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.SaveCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.UpdateCartRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.cart.CountCart;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.cart.GetByUserId;

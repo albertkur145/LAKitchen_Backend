@@ -1,8 +1,8 @@
 package com.lakitchen.LA.Kitchen.service;
 
-import com.lakitchen.LA.Kitchen.api.response.data.format.GetCategoriesAndSubFormat;
+import com.lakitchen.LA.Kitchen.api.response.data.shared.format.GetCategoriesAndSubFormat;
 import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
-import com.lakitchen.LA.Kitchen.api.response.data.GetCategories;
+import com.lakitchen.LA.Kitchen.api.response.data.shared.GetCategories;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.data.ProductCategoryData;
 import com.lakitchen.LA.Kitchen.data.ProductSubCategoryData;

@@ -1,6 +1,6 @@
 package com.lakitchen.LA.Kitchen.service.mapper;
 
-import com.lakitchen.LA.Kitchen.api.response.data.format.GetCategoriesAndSubFormat;
+import com.lakitchen.LA.Kitchen.api.response.data.shared.format.GetCategoriesAndSubFormat;
 import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import com.lakitchen.LA.Kitchen.model.entity.ProductCategory;
 import org.springframework.stereotype.Service;

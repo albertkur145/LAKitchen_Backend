@@ -1,17 +1,16 @@
 package com.lakitchen.LA.Kitchen.service;
 
 
+import com.lakitchen.LA.Kitchen.api.dto.PathDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductDetailDTO;
 import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
 import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.NewProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.admin.product.UpdateProductRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.product.IncrementSeenRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.CreateProduct;
-import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByCategory;
-import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByName;
-import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetByPrice;
-import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.GetBySubCategory;
+import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.*;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
 import com.lakitchen.LA.Kitchen.service.global.Func;
@@ -28,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -140,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findFirstById(productId);
             ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
             ArrayList<ProductAssessment> assessments = productAssessmentRepository
-                    .findByProduct_IdOrderByCreatedAtDesc(productId);
+                    .findByProduct_IdAndDeletedAtIsNullOrderByCreatedAtDescRateDesc(productId);
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {
@@ -152,9 +150,12 @@ public class ProductServiceImpl implements ProductService {
 
             Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(product.getId());
             Double rating = productMapper.getRating(productMapper.sumRate(assessments), totalAssessment);
+            ProductDetailDTO productDetailDTO = productMapper
+                    .mapToProductDetailDTO(product, photoDTOS, assessments, rating, totalAssessment);
+            PathDTO pathDTO = productMapper.mapToPathDTO(product);
 
             return new ResponseTemplate(200, "OK",
-                    productMapper.mapToProductDetailDTO(product, photoDTOS, assessments, rating, totalAssessment),
+                    new GetById(pathDTO, productDetailDTO),
                     null, null);
         }
 

@@ -1,7 +1,7 @@
 package com.lakitchen.LA.Kitchen.service.impl;
 
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.SaveCartRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.UpdateCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.SaveCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.UpdateCartRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 
 public interface CartService {

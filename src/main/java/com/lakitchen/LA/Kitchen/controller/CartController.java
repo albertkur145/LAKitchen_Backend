@@ -1,8 +1,8 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.CartPath;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.SaveCartRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.cart.UpdateCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.SaveCartRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.cart.UpdateCartRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.CartServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

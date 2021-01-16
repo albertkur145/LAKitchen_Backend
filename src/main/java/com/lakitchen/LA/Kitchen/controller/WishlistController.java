@@ -1,7 +1,7 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.WishlistPath;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.wishlist.SaveWishlistRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.wishlist.SaveWishlistRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.WishlistServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,5 +10,6 @@ import java.util.ArrayList;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer> {
 
     ArrayList<OrderDetail> findByOrder_OrderNumber(String orderNumber);
-
+    OrderDetail findFirstByOrder_OrderNumberAndProduct_Id(String orderNumber, Integer productId);
+    OrderDetail findFirstByProduct_IdAndIsAssessment(Integer productId, Integer isAssessment);
 }

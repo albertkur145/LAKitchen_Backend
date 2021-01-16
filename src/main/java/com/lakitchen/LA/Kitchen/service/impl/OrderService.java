@@ -1,6 +1,6 @@
 package com.lakitchen.LA.Kitchen.service.impl;
 
-import com.lakitchen.LA.Kitchen.api.requestbody.user.order.SaveOrderRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.SaveOrderRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 
 public interface OrderService {
@@ -10,5 +10,6 @@ public interface OrderService {
     ResponseTemplate getDetailByOrderNumber(String orderNumber);
     ResponseTemplate getForAssessment(String orderNumber, Integer productId);
     ResponseTemplate cancelOrder(String orderNumber);
+    ResponseTemplate getAllForAssessment(String orderNumber);
 
 }

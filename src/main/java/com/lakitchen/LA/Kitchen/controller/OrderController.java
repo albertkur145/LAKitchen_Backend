@@ -1,7 +1,7 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.OrderPath;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.order.SaveOrderRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.SaveOrderRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.service.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,12 @@ public class OrderController {
     public ResponseTemplate getForAssessment(@RequestParam("orderNumber") String orderNumber,
                                              @RequestParam("productId") Integer productId) {
         return orderService.getForAssessment(orderNumber, productId);
+    }
+
+    // ROLE_USER
+    @GetMapping(OrderPath.ORDER_GET_PRODUCTS_FOR_ASSESSMENT)
+    public ResponseTemplate getAllForAssessment(@RequestParam("orderNumber") String orderNumber) {
+        return orderService.getAllForAssessment(orderNumber);
     }
 
     // ROLE_USER

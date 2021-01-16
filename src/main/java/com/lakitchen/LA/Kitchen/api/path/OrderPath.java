@@ -13,5 +13,6 @@ public class OrderPath {
     public static final String ORDER_GET_ALL = ORDER + "";
     public static final String ORDER_GET_BY_ORDER_NUMBER = ORDER + "/id";
     public static final String ORDER_GET_FOR_ASSESSMENT = ORDER + "/productdetail";
+    public static final String ORDER_GET_PRODUCTS_FOR_ASSESSMENT = API + "/product/order";
 
 }

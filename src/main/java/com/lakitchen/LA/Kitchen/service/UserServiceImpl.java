@@ -1,8 +1,8 @@
 package com.lakitchen.LA.Kitchen.service;
 
-import com.lakitchen.LA.Kitchen.api.requestbody.user.user.ChangePasswordRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.user.RegisterRequest;
-import com.lakitchen.LA.Kitchen.api.requestbody.user.user.UpdateProfileRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.user.ChangePasswordRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.user.RegisterRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_user.user.UpdateProfileRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.model.entity.User;
 import com.lakitchen.LA.Kitchen.model.entity.UserRole;
@@ -16,8 +16,6 @@ import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
 
 @Service
 public class UserServiceImpl implements UserService {

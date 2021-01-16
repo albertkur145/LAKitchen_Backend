@@ -95,6 +95,26 @@ public class ProductMapper {
         );
     }
 
+    public ProductOrder2DTO mapToProductOrder2DTO(OrderDetail orderDetail) {
+        return new ProductOrder2DTO(
+                orderDetail.getProduct().getId(),
+                orderDetail.getProduct().getName(),
+                orderDetail.getPrice(),
+                orderDetail.getQuantity(),
+                this.getPhotoLink(orderDetail.getProduct().getId()),
+                orderDetail.getIsAssessment()
+        );
+    }
+
+    public PathDTO mapToPathDTO(Product product) {
+        ProductCategory category = product.getProductSubCategory().getProductCategory();
+        ProductSubCategory subCategory = product.getProductSubCategory();
+        return new PathDTO(
+                new IdNameDTO(category.getId(), category.getName()),
+                new IdNameDTO(subCategory.getId(), subCategory.getName())
+        );
+    }
+
     public ProductGeneralDTO setToFormatGeneralDTO(Product val) {
         ArrayList<ProductAssessment> productAssessments = productAssessmentRepository
                 .findByProduct_Id(val.getId());
