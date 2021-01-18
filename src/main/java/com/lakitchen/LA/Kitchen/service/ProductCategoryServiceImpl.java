@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.service;
 
+import com.lakitchen.LA.Kitchen.api.response.data.shared.GetCategoriesAndSub;
 import com.lakitchen.LA.Kitchen.api.response.data.shared.format.GetCategoriesAndSubFormat;
 import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import com.lakitchen.LA.Kitchen.api.response.data.shared.GetCategories;
@@ -107,7 +108,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
             return new ResponseTemplate(
                     200, "OK",
-                    getCategoriesAndSubFormats,
+                    new GetCategoriesAndSub(getCategoriesAndSubFormats),
                     null, null
             );
         }
@@ -215,13 +216,12 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 new ProductSubCategoryData("Bakso"),
                 new ProductSubCategoryData("Buah Beku"),
                 new ProductSubCategoryData("Camilan Beku"),
-                new ProductSubCategoryData("Daging Olahan Lainnya"),
                 new ProductSubCategoryData("Dessert"),
+                new ProductSubCategoryData("Dimsum"),
                 new ProductSubCategoryData("Kentang Beku"),
                 new ProductSubCategoryData("Nugget"),
                 new ProductSubCategoryData("Pastry & Olahan Tepung"),
                 new ProductSubCategoryData("Sayuran Beku"),
-                new ProductSubCategoryData("Siomay"),
                 new ProductSubCategoryData("Sosis")
         };
 

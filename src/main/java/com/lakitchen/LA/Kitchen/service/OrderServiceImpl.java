@@ -55,6 +55,9 @@ public class OrderServiceImpl implements OrderService {
     ProductMapper productMapper;
 
     @Autowired
+    CartRepository cartRepository;
+
+    @Autowired
     Func FUNC;
 
     @Override
@@ -63,10 +66,12 @@ public class OrderServiceImpl implements OrderService {
 
         if (result.getResult()) {
             Order order = new Order();
+            User user = userRepository.findFirstById(request.getUserId());
+
             order.setOrderNumber(this.setOrderNumber());
             order.setCreatedAt(FUNC.getCurrentTimestamp());
             order.setOrderStatus(orderStatusRepository.findFirstById(1));
-            order.setUser(userRepository.findFirstById(request.getUserId()));
+            order.setUser(user);
             Order orderSaved = orderRepository.save(order);
 
             final Integer[] totalPayment = {0};
@@ -84,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
                 orderDetail.setProduct(product);
                 orderDetail.setOrder(orderSaved);
                 orderDetailRepository.save(orderDetail);
+                cartRepository.deleteByUser_IdAndProduct_Id(user.getId(), product.getId());
             });
 
             Payment payment = new Payment();

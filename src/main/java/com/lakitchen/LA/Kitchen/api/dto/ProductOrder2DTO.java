@@ -11,5 +11,5 @@ public class ProductOrder2DTO {
     Integer price;
     Integer quantity;
     String photo_link;
-    Integer is_assessment;
+    Integer isAssessment;
 }

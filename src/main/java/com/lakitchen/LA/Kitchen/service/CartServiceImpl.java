@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
         if (result.getResult()) {
             Cart cart;
             if (this.isExistCart(request.getUserId(), request.getProductId())) {
-                cart = this.incrementQuantity(request.getUserId(), request.getProductId());
+                cart = this.incrementQuantity(request);
             } else {
                 cart = this.setNewCart(request);
             }
@@ -120,9 +120,9 @@ public class CartServiceImpl implements CartService {
         return cart;
     }
 
-    private Cart incrementQuantity(Integer userId, Integer productId) {
-        Cart cart = cartRepository.findByUser_IdAndProduct_Id(userId, productId);
-        cart.setQuantity(cart.getQuantity() + 1);
+    private Cart incrementQuantity(SaveCartRequest request) {
+        Cart cart = cartRepository.findByUser_IdAndProduct_Id(request.getUserId(), request.getProductId());
+        cart.setQuantity(cart.getQuantity() + request.getQuantity());
         return cart;
     }
 
