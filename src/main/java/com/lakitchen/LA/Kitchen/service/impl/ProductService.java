@@ -22,5 +22,6 @@ public interface ProductService {
     ResponseTemplate uploadPhoto(Integer productId, ArrayList<MultipartFile> files);
     ResponseTemplate saveNewProduct(NewProductRequest request);
     ResponseTemplate updateProduct(UpdateProductRequest request);
+    ResponseTemplate getAll(Integer page);
 
 }

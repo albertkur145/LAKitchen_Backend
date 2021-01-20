@@ -1,15 +1,13 @@
 package com.lakitchen.LA.Kitchen.service;
 
 
-import com.lakitchen.LA.Kitchen.api.dto.PathDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductDetailDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductPhotoDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ProductGeneralDTO;
+import com.lakitchen.LA.Kitchen.api.dto.*;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
-import com.lakitchen.LA.Kitchen.api.response.data.role_admin.CreateProduct;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.CreateProduct;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.GetAll;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.*;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
@@ -18,6 +16,9 @@ import com.lakitchen.LA.Kitchen.service.impl.ProductService;
 import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +51,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ShopRepository shopRepository;
+
+    @Autowired
+    private WishlistRepository wishlistRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     @Autowired
     private ProductMapper productMapper;
@@ -138,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findFirstById(productId);
             ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
             ArrayList<ProductAssessment> assessments = productAssessmentRepository
-                    .findByProduct_IdAndDeletedAtIsNullOrderByCreatedAtDescRateDesc(productId);
+                    .findByProduct_IdOrderByCreatedAtDescRateDesc(productId);
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {
@@ -252,8 +259,40 @@ public class ProductServiceImpl implements ProductService {
                     null, null, null);
         }
 
-        return new ResponseTemplate(result.getCode(), result.getStatus(),
-                null, null, result.getError());
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getAll(Integer page) {
+        Page<Product> products = productRepository
+                .findAll(PageRequest.of((page-1), 10, Sort.by("name").ascending()));
+        ArrayList<ProductAdminDTO> productDTOS = new ArrayList<>();
+
+        products.getContent().forEach((val) -> {
+            ArrayList<ProductAssessment> assessments = productAssessmentRepository
+                    .findByProduct_IdOrderByCreatedAtDescRateDesc(val.getId());
+            Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
+            Integer popularity = wishlistRepository.countByProduct_Id(val.getId());
+            ArrayList<OrderDetail> orderDetails = orderDetailRepository
+                    .findByProduct_IdAndOrder_OrderStatus_Id(val.getId(), 5);
+
+            Integer sold = this.getSumProductSold(orderDetails);
+            Double rating = productMapper.getRating(productMapper.sumRate(assessments), totalAssessment);
+            productDTOS.add(productMapper.mapToProductAdminDTO(val, rating, popularity, sold));
+        });
+
+        PageableDTO pageableDTO
+                = new PageableDTO((products.getNumber()+1),
+                (int) products.getTotalElements(), products.getSize());
+        return new ResponseTemplate(200, "OK", new GetAll(productDTOS), pageableDTO, null);
+    }
+
+    private Integer getSumProductSold(ArrayList<OrderDetail> orderDetails) {
+        final int[] sum = {0};
+        orderDetails.forEach((val) -> {
+            sum[0] += val.getQuantity();
+        });
+        return sum[0];
     }
 
     private String getTitleSelectionPrice(String from) {

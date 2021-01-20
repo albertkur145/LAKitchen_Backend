@@ -110,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
         BasicResult result = this.validationGetAllOrder(userId);
 
         if (result.getResult()) {
-            ArrayList<Order> orders = orderRepository.findByUser_Id(userId);
+            ArrayList<Order> orders = orderRepository.findByUser_IdOrderByCreatedAtDesc(userId);
 
             ArrayList<OrderGeneralDTO> dtos = new ArrayList<>();
             orders.forEach((val) -> {

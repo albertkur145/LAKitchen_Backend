@@ -11,5 +11,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
 
     ArrayList<OrderDetail> findByOrder_OrderNumber(String orderNumber);
     OrderDetail findFirstByOrder_OrderNumberAndProduct_Id(String orderNumber, Integer productId);
-    OrderDetail findFirstByProduct_IdAndIsAssessment(Integer productId, Integer isAssessment);
+    OrderDetail findFirstByOrder_OrderNumberAndProduct_IdAndIsAssessment(String orderNumber, Integer productId, Integer isAssessment);
+    ArrayList<OrderDetail> findByProduct_IdAndOrder_OrderStatus_Id(Integer productId, Integer statusId);
+
 }

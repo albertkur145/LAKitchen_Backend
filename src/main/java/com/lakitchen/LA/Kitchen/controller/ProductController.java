@@ -70,9 +70,16 @@ public class ProductController {
         return productService.saveNewProduct(objParam);
     }
 
+    // ROLE_ADMIN
     @PutMapping(ProductPath.ADMIN_PRODUCT_PUT)
     public ResponseTemplate updateProduct(@RequestBody UpdateProductRequest request) {
         return productService.updateProduct(request);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_ALL)
+    public ResponseTemplate getAll(@RequestParam("page") Integer page) {
+        return productService.getAll(page);
     }
 
 }

@@ -13,8 +13,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Product findFirstById(Integer id);
     ArrayList<Product> findByProductSubCategory_IdAndDeletedAt(Integer subCategoryId, Timestamp deletedAt);
     ArrayList<Product> findByNameIgnoreCaseContainingAndDeletedAt(String name, Timestamp deletedAt);
-    ArrayList<Product> findAllByDeletedAtOrderByPriceAsc(String deletedAt);
-    ArrayList<Product> findAllByDeletedAtOrderByPriceDesc(String deletedAt);
+    ArrayList<Product> findAllByDeletedAtOrderByPriceAsc(Timestamp deletedAt);
+    ArrayList<Product> findAllByDeletedAtOrderByPriceDesc(Timestamp deletedAt);
 
     @Query(value = "SELECT * FROM products p " +
             "JOIN sub_categories s ON (p.sub_category_id = s.id) " +

@@ -18,6 +18,7 @@ public class ProductPath {
 
     // ROLE_ADMIN ENDPOINT
     private static final String ADMIN_PRODUCT = ADMIN_API + "/product";
+    public static final String ADMIN_PRODUCT_GET_ALL = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_POST = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_PUT = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_PRODUCT + "/upload";

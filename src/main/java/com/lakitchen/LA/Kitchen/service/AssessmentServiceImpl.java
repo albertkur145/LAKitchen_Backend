@@ -70,7 +70,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         if (result.getResult()) {
             ArrayList<AssessmentDTO> assessmentDTOS = new ArrayList<>();
             ArrayList<ProductAssessment> productAssessments = assessmentRepository
-                    .findByProduct_IdAndDeletedAtIsNullOrderByCreatedAtDescRateDesc(productId);
+                    .findByProduct_IdOrderByCreatedAtDescRateDesc(productId);
             productAssessments.forEach((val) -> {
                 assessmentDTOS.add(assessmentMapper.mapToAssessmentDTO(val));
             });
@@ -111,7 +111,7 @@ public class AssessmentServiceImpl implements AssessmentService {
             return new BasicResult(false, "Produk ini tidak kamu beli di order tersebut", "NOT FOUND", 404);
         }
 
-        if (this.isAlreadyAssessment(request.getProductId())) {
+        if (this.isAlreadyAssessment(request.getOrderNumber(), request.getProductId())) {
             return new BasicResult(false, "Produk ini telah diberi penilaian", "NOT ACCEPTABLE", 406);
         }
 
@@ -131,8 +131,9 @@ public class AssessmentServiceImpl implements AssessmentService {
                 .findFirstByOrderNumberAndOrderStatus_IdAndUser_Id(orderNumber, 5, userId) != null;
     }
 
-    private Boolean isAlreadyAssessment(Integer productId) {
-        return orderDetailRepository.findFirstByProduct_IdAndIsAssessment(productId, 1) != null;
+    private Boolean isAlreadyAssessment(String orderNumber, Integer productId) {
+        return orderDetailRepository
+                .findFirstByOrder_OrderNumberAndProduct_IdAndIsAssessment(orderNumber, productId, 1) != null;
     }
 
     private Boolean isExistProductInOrder(String orderNumber, Integer productId) {

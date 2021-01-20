@@ -48,20 +48,37 @@ public class ProductMapper {
         );
     }
 
+    public ProductAdminDTO mapToProductAdminDTO(Product product, Double rating,
+                                                Integer popularity, Integer sold) {
+        return new ProductAdminDTO(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getProductSubCategory().getProductCategory().getName(),
+                product.getProductSubCategory().getName(),
+                popularity,
+                rating,
+                sold
+        );
+    }
+
     public ProductDetailDTO mapToProductDetailDTO(Product product, ArrayList<ProductPhotoDTO> productPhotoDTOS,
                                                   ArrayList<ProductAssessment> productAssessments,
                                                   Double rating, Integer totalAssessment) {
         ArrayList<ProductAssessmentDTO> assessmentDTOS = new ArrayList<>();
-        productAssessments.forEach((val) -> {
-            if (val.getDeletedAt() == null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                String dateOfAssessment = dateFormat.format(val.getCreatedAt());
-                IdNameDTO userDTO = new IdNameDTO(val.getUser().getId(), val.getUser().getName());
-                ProductAssessmentDTO dto = new ProductAssessmentDTO(val.getId(), userDTO,
-                        val.getRate().intValue(), val.getComment(), dateOfAssessment);
-                assessmentDTOS.add(dto);
+        for (int i = 0; i < productAssessments.size() ; i++) {
+            if (i > 2) {
+                break;
             }
-        });
+
+            ProductAssessment val = productAssessments.get(i);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String dateOfAssessment = dateFormat.format(val.getCreatedAt());
+            IdNameDTO userDTO = new IdNameDTO(val.getUser().getId(), val.getUser().getName());
+            ProductAssessmentDTO dto = new ProductAssessmentDTO(val.getId(), userDTO,
+                    val.getRate().intValue(), val.getComment(), dateOfAssessment);
+            assessmentDTOS.add(dto);
+        }
 
         return new ProductDetailDTO(
                 product.getId(),
