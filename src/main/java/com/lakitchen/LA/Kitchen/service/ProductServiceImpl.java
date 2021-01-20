@@ -8,7 +8,9 @@ import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenR
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.CreateProduct;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.GetAll;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.GetAllFavorite;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.*;
+import com.lakitchen.LA.Kitchen.api.dto.ProductFavoriteDTO;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
 import com.lakitchen.LA.Kitchen.service.global.Func;
@@ -28,8 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -285,6 +286,13 @@ public class ProductServiceImpl implements ProductService {
                 = new PageableDTO((products.getNumber()+1),
                 (int) products.getTotalElements(), products.getSize());
         return new ResponseTemplate(200, "OK", new GetAll(productDTOS), pageableDTO, null);
+    }
+
+    @Override
+    public ResponseTemplate getAllFavorite() {
+        ArrayList<ProductFavoriteDTO> dto = wishlistRepository.findBestFavoriteProduct(10);
+        return new ResponseTemplate(200, "OK",
+                new GetAllFavorite(dto), null, null);
     }
 
     private Integer getSumProductSold(ArrayList<OrderDetail> orderDetails) {

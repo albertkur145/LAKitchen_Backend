@@ -82,4 +82,10 @@ public class ProductController {
         return productService.getAll(page);
     }
 
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_ALL_FAVORITE)
+    public ResponseTemplate getAllFavorite() {
+        return productService.getAllFavorite();
+    }
+
 }

@@ -22,5 +22,6 @@ public class ProductPath {
     public static final String ADMIN_PRODUCT_POST = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_PUT = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_PRODUCT + "/upload";
+    public static final String ADMIN_PRODUCT_GET_ALL_FAVORITE = ADMIN_PRODUCT + "/favorite";
 
 }
