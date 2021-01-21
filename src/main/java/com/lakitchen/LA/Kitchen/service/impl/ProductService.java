@@ -23,6 +23,10 @@ public interface ProductService {
     ResponseTemplate saveNewProduct(NewProductRequest request);
     ResponseTemplate updateProduct(UpdateProductRequest request);
     ResponseTemplate getAll(Integer page);
-    ResponseTemplate getAllFavorite();
+    ResponseTemplate getTopFavorite();
+    ResponseTemplate getTopSelling();
+    ResponseTemplate getTopRating();
+    ResponseTemplate getTopFavoriteByCategory(Integer categoryId);
+    ResponseTemplate getTopSellingByCategory(Integer categoryId);
 
 }

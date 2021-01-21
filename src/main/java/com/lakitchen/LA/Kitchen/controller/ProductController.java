@@ -83,9 +83,33 @@ public class ProductController {
     }
 
     // ROLE_ADMIN
-    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_ALL_FAVORITE)
-    public ResponseTemplate getAllFavorite() {
-        return productService.getAllFavorite();
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_FAVORITE)
+    public ResponseTemplate getTopFavorite() {
+        return productService.getTopFavorite();
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_SELLING)
+    public ResponseTemplate getTopSelling() {
+        return productService.getTopSelling();
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_RATING)
+    public ResponseTemplate getTopRating() {
+        return productService.getTopRating();
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_FAVORITE_BY_CATEGORY)
+    public ResponseTemplate getTopFavoriteByCategory(@RequestParam("categoryId") Integer categoryId) {
+        return productService.getTopFavoriteByCategory(categoryId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_SELLING_BY_CATEGORY)
+    public ResponseTemplate getTopSellingByCategory(@RequestParam("categoryId") Integer categoryId) {
+        return productService.getTopSellingByCategory(categoryId);
     }
 
 }

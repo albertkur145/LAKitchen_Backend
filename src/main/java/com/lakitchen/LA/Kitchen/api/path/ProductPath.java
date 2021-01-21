@@ -22,6 +22,9 @@ public class ProductPath {
     public static final String ADMIN_PRODUCT_POST = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_PUT = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_PRODUCT + "/upload";
-    public static final String ADMIN_PRODUCT_GET_ALL_FAVORITE = ADMIN_PRODUCT + "/favorite";
-
+    public static final String ADMIN_PRODUCT_GET_TOP_FAVORITE = ADMIN_PRODUCT + "/favorite";
+    public static final String ADMIN_PRODUCT_GET_TOP_SELLING = ADMIN_PRODUCT + "/bestselling";
+    public static final String ADMIN_PRODUCT_GET_TOP_RATING = ADMIN_PRODUCT + "/bestrating";
+    public static final String ADMIN_PRODUCT_GET_TOP_FAVORITE_BY_CATEGORY = ADMIN_PRODUCT + "/favorite/category";
+    public static final String ADMIN_PRODUCT_GET_TOP_SELLING_BY_CATEGORY = ADMIN_PRODUCT + "/bestselling/category";
 }

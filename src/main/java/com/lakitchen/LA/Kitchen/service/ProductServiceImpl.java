@@ -6,11 +6,9 @@ import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductReq
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
-import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.CreateProduct;
-import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.GetAll;
-import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.GetAllFavorite;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.*;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.product.*;
-import com.lakitchen.LA.Kitchen.api.dto.ProductFavoriteDTO;
+import com.lakitchen.LA.Kitchen.api.dto.ProductTopFavoriteDTO;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.*;
 import com.lakitchen.LA.Kitchen.service.global.Func;
@@ -289,10 +287,40 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseTemplate getAllFavorite() {
-        ArrayList<ProductFavoriteDTO> dto = wishlistRepository.findBestFavoriteProduct(10);
+    public ResponseTemplate getTopFavorite() {
+        ArrayList<ProductTopFavoriteDTO> dto = wishlistRepository.findBestFavoriteProduct(10);
         return new ResponseTemplate(200, "OK",
-                new GetAllFavorite(dto), null, null);
+                new GetTopFavorite(dto), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getTopSelling() {
+        ArrayList<ProductTopSellingDTO> dto = orderDetailRepository.findBestSellingProduct(10);
+        return new ResponseTemplate(200, "OK",
+                new GetTopSelling(dto), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getTopRating() {
+        ArrayList<ProductTopRatingDTO> dto = productAssessmentRepository.findTopRatingProduct(10);
+        return new ResponseTemplate(200, "OK",
+                new GetTopRating(dto), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getTopFavoriteByCategory(Integer categoryId) {
+        ArrayList<ProductTopFavoriteCategoryDTO> dto
+                = wishlistRepository.findBestFavoriteProductByCategory(5, categoryId);
+        return new ResponseTemplate(200, "OK",
+                new GetTopFavoriteByCategory(dto), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getTopSellingByCategory(Integer categoryId) {
+        ArrayList<ProductTopSellingCategoryDTO> dto
+                = orderDetailRepository.findBestSellingProductByCategory(5, categoryId);
+        return new ResponseTemplate(200, "OK",
+                new GetTopSellingByCategory(dto), null, null);
     }
 
     private Integer getSumProductSold(ArrayList<OrderDetail> orderDetails) {
