@@ -14,4 +14,5 @@ public class ProductAdminDTO {
     Integer popularity;
     Double rating;
     Integer sold;
+    Integer isActive;
 }

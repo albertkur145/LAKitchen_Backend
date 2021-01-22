@@ -2,6 +2,7 @@ package com.lakitchen.LA.Kitchen.service;
 
 
 import com.lakitchen.LA.Kitchen.api.dto.*;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.ActivationProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
@@ -18,10 +19,12 @@ import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -148,10 +151,7 @@ public class ProductServiceImpl implements ProductService {
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {
-                String filePhotoName = productMapper.setFilePhotoName(val);
-                String photoLink = productMapper.setPhotoLink(filePhotoName);
-                ProductPhotoDTO dto = new ProductPhotoDTO(val.getId(), photoLink);
-                photoDTOS.add(dto);
+                photoDTOS.add(productMapper.mapToProductPhotoDTO(val));
             });
 
             Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(product.getId());
@@ -214,6 +214,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ResponseTemplate deletePhoto(Integer photoId) {
+        if (productPhotoRepository.findFirstById(photoId) != null) {
+            productPhotoRepository.deleteById(photoId);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+        return new ResponseTemplate(404, "NOT FOUND", null, null, "Photo tidak ditemukan");
+    }
+
+    @Override
     public ResponseTemplate saveNewProduct(NewProductRequest request) {
         BasicResult result = this.validationSaveNewProduct(request);
 
@@ -268,22 +277,33 @@ public class ProductServiceImpl implements ProductService {
         ArrayList<ProductAdminDTO> productDTOS = new ArrayList<>();
 
         products.getContent().forEach((val) -> {
-            ArrayList<ProductAssessment> assessments = productAssessmentRepository
-                    .findByProduct_IdOrderByCreatedAtDescRateDesc(val.getId());
-            Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
-            Integer popularity = wishlistRepository.countByProduct_Id(val.getId());
-            ArrayList<OrderDetail> orderDetails = orderDetailRepository
-                    .findByProduct_IdAndOrder_OrderStatus_Id(val.getId(), 5);
-
-            Integer sold = this.getSumProductSold(orderDetails);
-            Double rating = productMapper.getRating(productMapper.sumRate(assessments), totalAssessment);
-            productDTOS.add(productMapper.mapToProductAdminDTO(val, rating, popularity, sold));
+            productDTOS.add(this.helperMapToProductAdminDTO(val));
         });
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(products);
 
-        PageableDTO pageableDTO
-                = new PageableDTO((products.getNumber()+1),
-                (int) products.getTotalElements(), products.getSize());
-        return new ResponseTemplate(200, "OK", new GetAll(productDTOS), pageableDTO, null);
+        return new ResponseTemplate(200, "OK",
+                new GetAll(productDTOS), pageableDTO, null);
+    }
+
+    @Override
+    public ResponseTemplate getByIdAdmin(Integer productId) {
+        BasicResult result = this.validationGetByIdAdmin(productId);
+
+        if (result.getResult()) {
+            Product product = productRepository.findFirstById(productId);
+            ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
+
+            ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
+            photos.forEach((val) -> {
+                photoDTOS.add(productMapper.mapToProductPhotoDTO(val));
+            });
+            ProductDetail2DTO dto = productMapper.mapToProductDetail2DTO(product, photoDTOS);
+
+            return new ResponseTemplate(200, "OK",
+                    new GetByIdAdmin(dto), null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
     }
 
     @Override
@@ -323,6 +343,83 @@ public class ProductServiceImpl implements ProductService {
                 new GetTopSellingByCategory(dto), null, null);
     }
 
+    @Override
+    public ResponseTemplate getTopRatingByCategory(Integer categoryId) {
+        ArrayList<ProductTopRatingCategoryDTO> dto
+                = productAssessmentRepository.findTopRatingProductByCategory(5, categoryId);
+        return new ResponseTemplate(200, "OK",
+                new GetTopRatingByCategory(dto), null, null);
+    }
+
+    @Override
+    public ResponseTemplate getByCategoryAdmin(Integer page, Integer categoryId) {
+        Pageable paging = PageRequest.of((page-1), 10, Sort.by("name").ascending());
+        Page<Product> products = productRepository
+                .findByCategoryAdmin(categoryId, paging);
+        ArrayList<ProductAdminDTO> productDTOS = new ArrayList<>();
+
+        products.getContent().forEach((val) -> {
+            productDTOS.add(this.helperMapToProductAdminDTO(val));
+        });
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(products);
+
+        return new ResponseTemplate(200, "OK",
+                new GetByCategoryAdmin(productDTOS), pageableDTO, null);
+    }
+
+    @Override
+    public ResponseTemplate getByNameAdmin(Integer page, String productName) {
+        Pageable paging = PageRequest.of((page-1), 10, Sort.by("name").ascending());
+        Page<Product> products = productRepository
+                .findByNameIgnoreCaseContaining(productName, paging);
+        ArrayList<ProductAdminDTO> productDTOS = new ArrayList<>();
+
+        products.getContent().forEach((val) -> {
+            productDTOS.add(this.helperMapToProductAdminDTO(val));
+        });
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(products);
+
+        return new ResponseTemplate(200, "OK", new GetByNameAdmin(productDTOS), pageableDTO, null);
+    }
+
+    @Override
+    public ResponseTemplate deleteProduct(Integer productId) {
+        BasicResult result = this.validationDeleteProduct(productId);
+
+        if (result.getResult()) {
+            Product product = productRepository.findFirstById(productId);
+            product.setDeletedAt(FUNC.getCurrentTimestamp());
+            productRepository.save(product);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate activationProduct(ActivationProductRequest request) {
+        BasicResult result = this.validationActivationProduct(request.getId());
+
+        if (result.getResult()) {
+            Product product = productRepository.findFirstById(request.getId());
+            product.setDeletedAt(null);
+            productRepository.save(product);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    private ProductAdminDTO helperMapToProductAdminDTO(Product val) {
+        ArrayList<ProductAssessment> assessments = productAssessmentRepository
+                .findByProduct_IdOrderByCreatedAtDescRateDesc(val.getId());
+        Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
+        Integer popularity = wishlistRepository.countByProduct_Id(val.getId());
+        ArrayList<OrderDetail> orderDetails = orderDetailRepository
+                .findByProduct_IdAndOrder_OrderStatus_Id(val.getId(), 5);
+        Integer sold = this.getSumProductSold(orderDetails);
+        Double rating = productMapper.getRating(productMapper.sumRate(assessments), totalAssessment);
+        return productMapper.mapToProductAdminDTO(val, rating, popularity, sold);
+    }
+
     private Integer getSumProductSold(ArrayList<OrderDetail> orderDetails) {
         final int[] sum = {0};
         orderDetails.forEach((val) -> {
@@ -345,6 +442,27 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productRepository.findAllByDeletedAtOrderByPriceDesc(null);
+    }
+
+    private BasicResult validationDeleteProduct(Integer productId) {
+        if (!FUNC.isExistProduct(productId)) {
+            return new BasicResult(false, "Product tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+    private BasicResult validationActivationProduct(Integer productId) {
+        if (!FUNC.isExistProduct(productId)) {
+            return new BasicResult(false, "Product tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+    private BasicResult validationGetByIdAdmin(Integer productId) {
+        if (!FUNC.isExistProduct(productId)) {
+            return new BasicResult(false, "Product tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationIncrementSeen(IncrementSeenRequest request) {

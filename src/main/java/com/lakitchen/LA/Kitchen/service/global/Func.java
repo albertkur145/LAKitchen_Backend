@@ -1,8 +1,10 @@
 package com.lakitchen.LA.Kitchen.service.global;
 
+import com.lakitchen.LA.Kitchen.api.dto.PageableDTO;
 import com.lakitchen.LA.Kitchen.repository.ProductRepository;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -40,6 +42,11 @@ public class Func {
     public String getFormatDateSimplified(Timestamp param) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
         return dateFormat.format(param);
+    }
+
+    public PageableDTO mapToPageableDTO(Page<?> data) {
+        return new PageableDTO((data.getNumber()+1),
+                (int) data.getTotalElements(), data.getSize());
     }
 
     public String getFormatDateIndonesian(Timestamp param) {

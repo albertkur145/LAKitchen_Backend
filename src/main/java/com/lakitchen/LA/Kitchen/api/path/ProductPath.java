@@ -19,12 +19,19 @@ public class ProductPath {
     // ROLE_ADMIN ENDPOINT
     private static final String ADMIN_PRODUCT = ADMIN_API + "/product";
     public static final String ADMIN_PRODUCT_GET_ALL = ADMIN_PRODUCT + "";
+    public static final String ADMIN_PRODUCT_GET_BY_ID = ADMIN_PRODUCT + "/id";
+    public static final String ADMIN_PRODUCT_GET_ALL_BY_CATEGORY = ADMIN_PRODUCT + "/category";
+    public static final String ADMIN_PRODUCT_GET_ALL_BY_NAME = ADMIN_PRODUCT + "/name";
     public static final String ADMIN_PRODUCT_POST = ADMIN_PRODUCT + "";
     public static final String ADMIN_PRODUCT_PUT = ADMIN_PRODUCT + "";
+    public static final String ADMIN_PRODUCT_DELETE = ADMIN_PRODUCT + "";
+    public static final String ADMIN_PRODUCT_ACTIVATION = ADMIN_PRODUCT + "/activation";
     public static final String ADMIN_PRODUCT_UPLOAD_PHOTO = ADMIN_PRODUCT + "/upload";
+    public static final String ADMIN_PRODUCT_DELETE_PHOTO = ADMIN_PRODUCT + "/upload";
     public static final String ADMIN_PRODUCT_GET_TOP_FAVORITE = ADMIN_PRODUCT + "/favorite";
     public static final String ADMIN_PRODUCT_GET_TOP_SELLING = ADMIN_PRODUCT + "/bestselling";
     public static final String ADMIN_PRODUCT_GET_TOP_RATING = ADMIN_PRODUCT + "/bestrating";
     public static final String ADMIN_PRODUCT_GET_TOP_FAVORITE_BY_CATEGORY = ADMIN_PRODUCT + "/favorite/category";
     public static final String ADMIN_PRODUCT_GET_TOP_SELLING_BY_CATEGORY = ADMIN_PRODUCT + "/bestselling/category";
+    public static final String ADMIN_PRODUCT_GET_TOP_RATING_BY_CATEGORY = ADMIN_PRODUCT + "/bestrating/category";
 }

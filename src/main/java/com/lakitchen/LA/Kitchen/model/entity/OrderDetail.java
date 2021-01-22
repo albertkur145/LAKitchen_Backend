@@ -24,7 +24,7 @@ public class OrderDetail implements Serializable {
     private Order order;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderDetailConstant.PRODUCT_ID)
     private Product product;
 

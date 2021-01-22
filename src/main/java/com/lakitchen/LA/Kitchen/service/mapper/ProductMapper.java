@@ -4,10 +4,10 @@ import com.lakitchen.LA.Kitchen.api.dto.*;
 import com.lakitchen.LA.Kitchen.model.entity.*;
 import com.lakitchen.LA.Kitchen.repository.ProductAssessmentRepository;
 import com.lakitchen.LA.Kitchen.repository.ProductPhotoRepository;
-import com.lakitchen.LA.Kitchen.repository.UserRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,9 +21,6 @@ import java.util.ArrayList;
 
 @Service
 public class ProductMapper {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private ProductPhotoRepository productPhotoRepository;
@@ -58,7 +55,8 @@ public class ProductMapper {
                 product.getProductSubCategory().getName(),
                 popularity,
                 rating,
-                sold
+                sold,
+                this.isActiveProduct(product)
         );
     }
 
@@ -91,6 +89,26 @@ public class ProductMapper {
                 productPhotoDTOS,
                 assessmentDTOS
         );
+    }
+
+    public ProductDetail2DTO mapToProductDetail2DTO(Product product,
+                                                    ArrayList<ProductPhotoDTO> productPhotoDTOS) {
+        return new ProductDetail2DTO(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getDescription(),
+                product.getProductSubCategory().getProductCategory().getId(),
+                product.getProductSubCategory().getId(),
+                this.isActiveProduct(product),
+                productPhotoDTOS
+        );
+    }
+
+    public ProductPhotoDTO mapToProductPhotoDTO(ProductPhoto photo) {
+        String filePhotoName = this.setFilePhotoName(photo);
+        String photoLink = this.setPhotoLink(filePhotoName);
+        return new ProductPhotoDTO(photo.getId(), photoLink);
     }
 
     public ProductCartDTO mapToProductCartDTO(Product product, Cart cart) {
@@ -224,6 +242,13 @@ public class ProductMapper {
         }
 
         return null;
+    }
+
+    public Integer isActiveProduct(Product product) {
+        if (product.getDeletedAt() == null) {
+            return 1;
+        }
+        return 0;
     }
 
 }

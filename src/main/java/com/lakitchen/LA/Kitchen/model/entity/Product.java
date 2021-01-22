@@ -67,6 +67,6 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private Set<Cart> carts;
 
-//    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
 //    private OrderDetail orderDetail;
 }

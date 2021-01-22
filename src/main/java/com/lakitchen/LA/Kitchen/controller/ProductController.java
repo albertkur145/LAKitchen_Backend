@@ -1,6 +1,7 @@
 package com.lakitchen.LA.Kitchen.controller;
 
 import com.lakitchen.LA.Kitchen.api.path.ProductPath;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.ActivationProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
@@ -112,4 +113,47 @@ public class ProductController {
         return productService.getTopSellingByCategory(categoryId);
     }
 
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_TOP_RATING_BY_CATEGORY)
+    public ResponseTemplate getTopRatingByCategory(@RequestParam("categoryId") Integer categoryId) {
+        return productService.getTopRatingByCategory(categoryId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_ALL_BY_CATEGORY)
+    public ResponseTemplate getByCategoryAdmin(@RequestParam("page") Integer page,
+            @RequestParam("categoryId") Integer categoryId) {
+        return productService.getByCategoryAdmin(page, categoryId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_BY_ID)
+    public ResponseTemplate getByIdAdmin(@RequestParam("id") Integer productId) {
+        return productService.getByIdAdmin(productId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(ProductPath.ADMIN_PRODUCT_GET_ALL_BY_NAME)
+    public ResponseTemplate getByNameAdmin(@RequestParam("page") Integer page,
+                                           @RequestParam("name") String productName) {
+        return productService.getByNameAdmin(page, productName);
+    }
+
+    // ROLE_ADMIN
+    @DeleteMapping(ProductPath.ADMIN_PRODUCT_DELETE)
+    public ResponseTemplate deleteProduct(@RequestParam("id") Integer productId) {
+        return productService.deleteProduct(productId);
+    }
+
+    // ROLE_ADMIN
+    @PutMapping(ProductPath.ADMIN_PRODUCT_ACTIVATION)
+    public ResponseTemplate activationProduct(@RequestBody ActivationProductRequest objParam) {
+        return productService.activationProduct(objParam);
+    }
+
+    // ROLE_ADMIN
+    @DeleteMapping(ProductPath.ADMIN_PRODUCT_DELETE_PHOTO)
+    public ResponseTemplate deletePhoto(@RequestParam("photoId") Integer photoId) {
+        return productService.deletePhoto(photoId);
+    }
 }
