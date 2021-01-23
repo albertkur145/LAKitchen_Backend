@@ -16,4 +16,7 @@ public interface ProductPhotoRepository extends JpaRepository<ProductPhoto, Inte
 
     @Transactional
     void deleteById(Integer id);
+
+    @Transactional
+    void deleteByProduct_Id(Integer productId);
 }

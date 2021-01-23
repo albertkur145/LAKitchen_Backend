@@ -17,6 +17,7 @@ public class ProductDetailDTO {
     Integer seen;
     Double rating;
     Integer evaluators;
+    Integer isActive;
     ArrayList<ProductPhotoDTO> photo_links;
     ArrayList<ProductAssessmentDTO> assessment;
 }

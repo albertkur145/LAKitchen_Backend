@@ -5,6 +5,7 @@ import com.lakitchen.LA.Kitchen.api.dto.*;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.ActivationProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.NewProductRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UpdateProductRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.product.UploadPhotoRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.product.IncrementSeenRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.product.*;
@@ -188,6 +189,7 @@ public class ProductServiceImpl implements ProductService {
         BasicResult result = this.validationUploadPhoto(productId, files);
 
         if (result.getResult()) {
+            this.deleteProductPhotos(productId);
             files.forEach((file) -> {
                 String uuid = UUID.randomUUID().toString();
                 String filename = StringUtils.cleanPath(file.getOriginalFilename());
@@ -406,6 +408,20 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseTemplate(200, "OK", null, null, null);
         }
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    private void deleteProductPhotos(Integer productId) {
+        ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
+
+        photos.forEach((val) -> {
+            Path path = Paths.get(productMapper.getProjectDir() + val.getFilename());
+            try {
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        productPhotoRepository.deleteByProduct_Id(productId);
     }
 
     private ProductAdminDTO helperMapToProductAdminDTO(Product val) {

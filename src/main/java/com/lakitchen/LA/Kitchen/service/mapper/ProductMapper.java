@@ -41,7 +41,8 @@ public class ProductMapper {
                 product.getPrice(),
                 photoLink,
                 rating,
-                totalAssessment
+                totalAssessment,
+                this.isActiveProduct(product)
         );
     }
 
@@ -86,6 +87,7 @@ public class ProductMapper {
                 product.getSeen(),
                 rating,
                 totalAssessment,
+                this.isActiveProduct(product),
                 productPhotoDTOS,
                 assessmentDTOS
         );

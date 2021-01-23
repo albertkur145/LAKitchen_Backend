@@ -12,4 +12,5 @@ public class ProductGeneralDTO {
     String photo_link;
     Double rating;
     Integer evaluators;
+    Integer isActive;
 }
