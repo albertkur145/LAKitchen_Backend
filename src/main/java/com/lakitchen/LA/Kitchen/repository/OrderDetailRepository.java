@@ -35,4 +35,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
             "GROUP BY od.product_id, p.name, c.name, sc.name " +
             "ORDER BY sold DESC LIMIT ?1", nativeQuery = true)
     ArrayList<ProductTopSellingCategoryDTO> findBestSellingProductByCategory(Integer limit, Integer categoryId);
+
+    @Query(value = "SELECT SUM(quantity) FROM order_detail " +
+            "WHERE order_number = ?1", nativeQuery = true)
+    Integer sumQuantityByOrderNumber(String orderNumber);
 }
