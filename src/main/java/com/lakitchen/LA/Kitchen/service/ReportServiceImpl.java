@@ -1,9 +1,6 @@
 package com.lakitchen.LA.Kitchen.service;
 
-import com.lakitchen.LA.Kitchen.api.dto.DashboardOrderDTO;
-import com.lakitchen.LA.Kitchen.api.dto.DashboardOthersDTO;
-import com.lakitchen.LA.Kitchen.api.dto.DashboardSalesDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ReportDTO;
+import com.lakitchen.LA.Kitchen.api.dto.*;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.dashboard.GetAll;
 import com.lakitchen.LA.Kitchen.model.entity.Order;
@@ -55,12 +52,12 @@ public class ReportServiceImpl implements ReportService {
 
         Integer newUsers = userRepository.countNewUsers();
         Integer allUser = (int) userRepository.count();
-        ArrayList<Payment> payments = paymentRepository.findLastWeek(5);
+        ArrayList<Report2DTO> payments = paymentRepository.findLastWeek(5);
 
         DashboardOrderDTO orderDTO = reportMapper.mapToDashboardOrderDTO(orderToday, orderPrepared, orderReadyToShip, orderInDelivery);
         DashboardSalesDTO salesDTO = reportMapper.mapToDashboardSalesDTO(todayIncome, weekIncome, productSoldToday);
         DashboardOthersDTO othersDTO = reportMapper.mapToDashboardOthersDTO(newUsers, allUser);
-        ArrayList<ReportDTO> weeklyReport = reportMapper.helperMapReportDTO(payments);
+        ArrayList<ReportDTO> weeklyReport = reportMapper.helperMapFromReport2DTO(payments);
 
         return new ResponseTemplate(200, "OK",
                 new GetAll(orderDTO, salesDTO, othersDTO, weeklyReport),

@@ -1,9 +1,6 @@
 package com.lakitchen.LA.Kitchen.service.mapper;
 
-import com.lakitchen.LA.Kitchen.api.dto.DashboardOrderDTO;
-import com.lakitchen.LA.Kitchen.api.dto.DashboardOthersDTO;
-import com.lakitchen.LA.Kitchen.api.dto.DashboardSalesDTO;
-import com.lakitchen.LA.Kitchen.api.dto.ReportDTO;
+import com.lakitchen.LA.Kitchen.api.dto.*;
 import com.lakitchen.LA.Kitchen.model.entity.Order;
 import com.lakitchen.LA.Kitchen.model.entity.OrderDetail;
 import com.lakitchen.LA.Kitchen.model.entity.Payment;
@@ -13,6 +10,7 @@ import com.lakitchen.LA.Kitchen.service.global.Func;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Service
@@ -48,6 +46,15 @@ public class ReportMapper {
         ArrayList<ReportDTO> dtos = new ArrayList<>();
         payments.forEach((val) -> {
             dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(val.getCreatedAt()), val.getTotal()));
+        });
+        return dtos;
+    }
+
+    public ArrayList<ReportDTO> helperMapFromReport2DTO(ArrayList<Report2DTO> dto) {
+        ArrayList<ReportDTO> dtos = new ArrayList<>();
+        dto.forEach((val) -> {
+            Timestamp timestamp = Timestamp.valueOf(val.getCreatedAt() + " 00:00:00");
+            dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(timestamp), val.getIncome()));
         });
         return dtos;
     }

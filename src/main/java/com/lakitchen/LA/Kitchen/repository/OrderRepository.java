@@ -1,13 +1,13 @@
 package com.lakitchen.LA.Kitchen.repository;
 
 import com.lakitchen.LA.Kitchen.model.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -16,7 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Order findFirstByOrderNumberAndOrderStatus_Id(String orderNumber, Integer id);
     Order findFirstByOrderNumberAndOrderStatus_IdAndUser_Id(String orderNumber, Integer id, Integer userId);
     ArrayList<Order> findByUser_IdOrderByCreatedAtDesc(Integer userId);
-
+    Page<Order> findByOrderStatus_Id(Pageable pageable, Integer statusId);
     Integer countByOrderStatus_Id(Integer statusId);
 
     @Query(value = "SELECT COUNT(created_at) FROM orders WHERE " +

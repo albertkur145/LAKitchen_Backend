@@ -18,4 +18,10 @@ public class OrderPath {
 
     // ROLE_ADMIN
     private static final String ADMIN_ORDER = ADMIN_API + "/order";
+    public static final String ADMIN_GET_BY_STATUS = ADMIN_ORDER + "/status";
+    public static final String ADMIN_GET_DETAIL_ORDER = ADMIN_ORDER + "/id";
+    public static final String ADMIN_UPDATE_STATUS_ORDER = ADMIN_ORDER + "";
+    public static final String ADMIN_CONFIRM_UNPROCESSED = ADMIN_ORDER + "/unprocessed";
+    public static final String ADMIN_GET_UNPROCESSED = ADMIN_ORDER + "/unprocessed";
+    public static final String ADMIN_SEARCH_UNPROCESSED = ADMIN_ORDER + "/search/unprocessed";
 }

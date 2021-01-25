@@ -26,6 +26,16 @@ public class OrderMapper {
         );
     }
 
+    public OrderAdminDTO mapToOrderAdminDTO(Order order, Payment payment) {
+        return new OrderAdminDTO(
+                order.getOrderNumber(),
+                FUNC.getFormatDateIndonesian(order.getCreatedAt()),
+                order.getOrderStatus().getName(),
+                payment.getPaymentMethod().getName(),
+                payment.getTotal()
+        );
+    }
+
     public ProductOrderDTO mapToProductOrderDTO(OrderDetail orderDetail) {
         return new ProductOrderDTO(
                 orderDetail.getProduct().getId(),

@@ -1,9 +1,12 @@
 package com.lakitchen.LA.Kitchen.service;
 
 import com.lakitchen.LA.Kitchen.api.dto.*;
+import com.lakitchen.LA.Kitchen.api.requestbody.role_admin.order.UpdateStatusRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.SaveOrderRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.helper.ProductHelper;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetById;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetByStatus;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetAllForAssessment;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetByUserId;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetDetailByNumber;
@@ -14,8 +17,13 @@ import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.OrderService;
 import com.lakitchen.LA.Kitchen.service.mapper.OrderMapper;
 import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
+import com.lakitchen.LA.Kitchen.service.mapper.UserMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -53,6 +61,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     ProductMapper productMapper;
+
+    @Autowired
+    UserMapper userMapper;
 
     @Autowired
     CartRepository cartRepository;
@@ -132,11 +143,8 @@ public class OrderServiceImpl implements OrderService {
             Order order = orderRepository.findFirstByOrderNumber(orderNumber);
             Payment payment = paymentRepository.findFirstByOrder_OrderNumber(orderNumber);
             ArrayList<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderNumber(orderNumber);
+            ArrayList<ProductOrderDTO> productOrderDTOS = this.helperMapToProductOrder(orderDetails);
 
-            ArrayList<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
-            orderDetails.forEach((val) -> {
-                productOrderDTOS.add(orderMapper.mapToProductOrderDTO(val));
-            });
             return new ResponseTemplate(200, "OK",
                     new GetDetailByNumber(orderMapper.mapToOrderDetailDTO(order,
                             payment, order.getOrderStatus(), productOrderDTOS)),
@@ -200,6 +208,101 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getByStatus(Integer page, Integer statusId) {
+        Pageable paging = PageRequest.of((page-1), 10, Sort.by("createdAt").descending());
+        Page<Order> orders = orderRepository.findByOrderStatus_Id(paging, statusId);
+        ArrayList<OrderGeneralDTO> dtos = new ArrayList<>();
+
+        orders.getContent().forEach((val) -> {
+            dtos.add(orderMapper.mapToOrderGeneralDTO(val, val.getPayment(), val.getOrderStatus()));
+        });
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
+
+        return new ResponseTemplate(200, "OK",
+                new GetByStatus(dtos), pageableDTO, null);
+    }
+
+    @Override
+    public ResponseTemplate getById(String orderNumber) {
+        BasicResult result = this.validationGetById(orderNumber);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(orderNumber);
+            Payment payment = paymentRepository.findFirstByOrder_OrderNumber(orderNumber);
+            User user = userRepository.findFirstById(order.getUser().getId());
+            ArrayList<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderNumber(orderNumber);
+
+            OrderAdminDTO orderDTO = orderMapper.mapToOrderAdminDTO(order, payment);
+            UserDTO userDTO = userMapper.mapToUserDTO(user);
+            ArrayList<ProductOrderDTO> productOrderDTOS = this.helperMapToProductOrder(orderDetails);
+            return new ResponseTemplate(200, "OK",
+                    new GetById(userDTO, orderDTO, productOrderDTOS),
+                    null, result.getError());
+
+        }
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate updateStatusOrder(UpdateStatusRequest request) {
+        BasicResult result = this.validateUpdateStatusOrder(request);
+
+        if (result.getResult()) {
+            Order order = orderRepository.findFirstByOrderNumber(request.getOrderNumber());
+            order.setOrderStatus(orderStatusRepository.findFirstById(request.getOrderStatusId()));
+            orderRepository.save(order);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate confirmUnprocessed() {
+        return null;
+    }
+
+    @Override
+    public ResponseTemplate getUnprocessed() {
+        return null;
+    }
+
+    @Override
+    public ResponseTemplate searchUnprocessed() {
+        return null;
+    }
+
+    private BasicResult validateUpdateStatusOrder(UpdateStatusRequest request) {
+        if (request.getOrderNumber() == null || request.getOrderStatusId() == null) {
+            return new BasicResult(false, "Form tidak lengkap", "BAD REQUEST", 400);
+        }
+
+        if (!this.isExistOrder(request.getOrderNumber())) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        if (!this.isExistOrderStatus(request.getOrderStatusId())) {
+            return new BasicResult(false, "Status order tidak ditemukan", "NOT FOUND", 404);
+        }
+
+        return new BasicResult(true, null, "OK", 200);
+    }
+
+    private ArrayList<ProductOrderDTO> helperMapToProductOrder(ArrayList<OrderDetail> orderDetails) {
+        ArrayList<ProductOrderDTO> dto = new ArrayList<>();
+        orderDetails.forEach((val) -> {
+            dto.add(orderMapper.mapToProductOrderDTO(val));
+        });
+        return dto;
+    }
+
+    private BasicResult validationGetById(String orderNumber) {
+        if (!this.isExistOrder(orderNumber)) {
+            return new BasicResult(false, "Order tidak ditemukan", "NOT FOUND", 404);
+        }
+        return new BasicResult(true, null, "OK", 200);
     }
 
     private BasicResult validationGetAllForAssessment(String orderNumber) {
@@ -275,6 +378,9 @@ public class OrderServiceImpl implements OrderService {
         return new BasicResult(true, null, "OK", 200);
     }
 
+    private Boolean isExistOrderStatus(Integer id) {
+        return orderStatusRepository.findFirstById(id) != null;
+    }
 
     private Boolean isExistOrder(String orderNumber) {
         return orderRepository.findFirstByOrderNumber(orderNumber) != null;
