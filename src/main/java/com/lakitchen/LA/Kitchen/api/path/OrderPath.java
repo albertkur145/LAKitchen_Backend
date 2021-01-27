@@ -24,4 +24,8 @@ public class OrderPath {
     public static final String ADMIN_CONFIRM_UNPROCESSED = ADMIN_ORDER + "/unprocessed";
     public static final String ADMIN_GET_UNPROCESSED = ADMIN_ORDER + "/unprocessed";
     public static final String ADMIN_SEARCH_UNPROCESSED = ADMIN_ORDER + "/search/unprocessed";
+    public static final String ADMIN_GET_PROCESSED = ADMIN_ORDER + "";
+    public static final String ADMIN_SEARCH_PROCESSED = ADMIN_ORDER + "/search";
+    public static final String ADMIN_GET_HISTORY = ADMIN_ORDER + "/history";
+    public static final String ADMIN_SEARCH_HISTORY = ADMIN_ORDER + "/search/history";
 }

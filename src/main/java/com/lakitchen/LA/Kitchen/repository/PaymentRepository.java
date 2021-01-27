@@ -13,13 +13,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
     Payment findFirstByOrder_OrderNumber(String orderNumber);
 
-    @Query(value = "SELECT TO_DATE(CAST(p.created_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
+    @Query(value = "SELECT TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
             "SUM(p.total) as income FROM payments p " +
             "JOIN orders o ON (p.order_number = o.order_number) " +
-            "WHERE TO_DATE(CAST(p.created_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
-            "AND TO_DATE(CAST(p.created_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) " +
-            "AND o.order_status_id = ?1 " +
+            "WHERE TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
+            "AND TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) " +
             "GROUP BY createdAt ORDER BY createdAt ASC", nativeQuery = true)
-    ArrayList<Report2DTO> findLastWeek(Integer statusId);
+    ArrayList<Report2DTO> findLastWeek();
 
 }

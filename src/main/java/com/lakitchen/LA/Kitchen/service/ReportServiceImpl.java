@@ -45,14 +45,14 @@ public class ReportServiceImpl implements ReportService {
         Integer orderReadyToShip = orderRepository.countByOrderStatus_Id(3);
         Integer orderInDelivery = orderRepository.countByOrderStatus_Id(4);
 
-        ArrayList<Order> orders = orderRepository.findByCurrentDate(5);
+        ArrayList<Order> orders = orderRepository.findByFinishedDate();
         Integer todayIncome = reportMapper.getIncome(orders);
-        Integer weekIncome = reportMapper.getIncome(orderRepository.findByLastWeek(5));
+        Integer weekIncome = reportMapper.getIncome(orderRepository.findByLastWeek());
         Integer productSoldToday = reportMapper.getQuantityOrderProduct(orders);
 
         Integer newUsers = userRepository.countNewUsers();
         Integer allUser = (int) userRepository.count();
-        ArrayList<Report2DTO> payments = paymentRepository.findLastWeek(5);
+        ArrayList<Report2DTO> payments = paymentRepository.findLastWeek();
 
         DashboardOrderDTO orderDTO = reportMapper.mapToDashboardOrderDTO(orderToday, orderPrepared, orderReadyToShip, orderInDelivery);
         DashboardSalesDTO salesDTO = reportMapper.mapToDashboardSalesDTO(todayIncome, weekIncome, productSoldToday);

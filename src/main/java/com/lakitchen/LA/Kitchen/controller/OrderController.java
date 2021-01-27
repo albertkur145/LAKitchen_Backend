@@ -93,4 +93,34 @@ public class OrderController {
         return orderService.searchByOrderNumberAndStatus(page, orderNumber, statusId);
     }
 
+    // ROLE_ADMIN
+    @GetMapping(OrderPath.ADMIN_GET_PROCESSED)
+    public ResponseTemplate getProcessed(@RequestParam("page") Integer page) {
+        int[] statusId = {2, 3, 4};
+        return orderService.getByStatus(page, statusId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(OrderPath.ADMIN_SEARCH_PROCESSED)
+    public ResponseTemplate searchProcessed(@RequestParam("page") Integer page,
+                                              @RequestParam("orderNumber") String orderNumber) {
+        int[] statusId = {2, 3, 4};
+        return orderService.searchByOrderNumberAndStatus(page, orderNumber, statusId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(OrderPath.ADMIN_GET_HISTORY)
+    public ResponseTemplate getHistory(@RequestParam("page") Integer page) {
+        int[] statusId = {5, 6};
+        return orderService.getByStatus(page, statusId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(OrderPath.ADMIN_SEARCH_HISTORY)
+    public ResponseTemplate searchHistory(@RequestParam("page") Integer page,
+                                            @RequestParam("orderNumber") String orderNumber) {
+        int[] statusId = {5, 6};
+        return orderService.searchByOrderNumberAndStatus(page, orderNumber, statusId);
+    }
+
 }

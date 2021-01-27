@@ -8,6 +8,6 @@ import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
-public class SearchUnprocessed {
+public class SearchOrder {
     ArrayList<OrderGeneralDTO> orders;
 }

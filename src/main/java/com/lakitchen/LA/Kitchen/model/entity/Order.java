@@ -27,6 +27,9 @@ public class Order implements Serializable {
     @Column(name = OrderConstant.CREATED_AT)
     private Timestamp createdAt;
 
+    @Column(name = OrderConstant.FINISHED_AT)
+    private Timestamp finishedAt;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderConstant.ORDER_STATUS_ID)

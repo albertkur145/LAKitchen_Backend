@@ -8,6 +8,7 @@ import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetById;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetByStatus;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetUnprocessed;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.SearchOrder;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetAllForAssessment;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetByUserId;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetDetailByNumber;
@@ -221,6 +222,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public ResponseTemplate getByStatus(Integer page, int[] statusId) {
+        Pageable paging = PageRequest.of((page-1), 10, Sort.by("createdAt").descending());
+        ArrayList<OrderStatus> orderStatus = this.getMultipleOrderStatus(statusId);
+        Page<Order> orders = orderRepository.findByOrderStatusIn(paging, orderStatus);
+        ArrayList<OrderGeneralDTO> dto = this.helperMapToOrderGeneralDTO(orders);
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
+        return new ResponseTemplate(200, "OK", new GetByStatus(dto), pageableDTO, null);
+    }
+
+    @Override
     public ResponseTemplate getById(String orderNumber) {
         BasicResult result = this.validationGetById(orderNumber);
 
@@ -248,6 +259,10 @@ public class OrderServiceImpl implements OrderService {
         if (result.getResult()) {
             Order order = orderRepository.findFirstByOrderNumber(request.getOrderNumber());
             order.setOrderStatus(orderStatusRepository.findFirstById(request.getOrderStatusId()));
+
+            if (request.getOrderStatusId() == 2) {
+                order.setFinishedAt(FUNC.getCurrentTimestamp());
+            }
             orderRepository.save(order);
             return new ResponseTemplate(200, "OK", null, null, null);
         }
@@ -263,7 +278,7 @@ public class OrderServiceImpl implements OrderService {
 
         ArrayList<OrderGeneralDTO> dto = this.helperMapToOrderGeneralDTO(orders);
         PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
-        return new ResponseTemplate(200, "OK", dto, pageableDTO, null);
+        return new ResponseTemplate(200, "OK", new SearchOrder(dto), pageableDTO, null);
     }
 
     private ArrayList<OrderGeneralDTO> helperMapToOrderGeneralDTO(Page<Order> orders) {

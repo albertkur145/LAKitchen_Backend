@@ -16,6 +16,7 @@ public interface OrderService {
 
     // ROLE_ADMIN
     ResponseTemplate getByStatus(Integer page, Integer statusId);
+    ResponseTemplate getByStatus(Integer page, int[] statusId);
     ResponseTemplate getById(String orderNumber);
     ResponseTemplate updateStatusOrder(UpdateStatusRequest request);
     ResponseTemplate searchByOrderNumberAndStatus(Integer page, String orderNumber, int[] statusId);
