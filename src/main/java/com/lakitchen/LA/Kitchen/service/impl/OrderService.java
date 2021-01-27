@@ -18,8 +18,6 @@ public interface OrderService {
     ResponseTemplate getByStatus(Integer page, Integer statusId);
     ResponseTemplate getById(String orderNumber);
     ResponseTemplate updateStatusOrder(UpdateStatusRequest request);
-    ResponseTemplate getUnprocessed();
-    ResponseTemplate searchUnprocessed();
-    ResponseTemplate confirmUnprocessed();
+    ResponseTemplate searchByOrderNumberAndStatus(Integer page, String orderNumber, int[] statusId);
 
 }

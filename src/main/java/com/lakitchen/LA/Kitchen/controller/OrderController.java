@@ -73,21 +73,24 @@ public class OrderController {
     }
 
     // ROLE_ADMIN
-    @GetMapping(OrderPath.ADMIN_CONFIRM_UNPROCESSED)
-    public ResponseTemplate confirmUnprocessed() {
-        return orderService.confirmUnprocessed();
+    @PutMapping(OrderPath.ADMIN_CONFIRM_UNPROCESSED)
+    public ResponseTemplate confirmUnprocessed(@RequestBody UpdateStatusRequest objParam) {
+        objParam.setOrderStatusId(2);
+        return orderService.updateStatusOrder(objParam);
     }
 
     // ROLE_ADMIN
     @GetMapping(OrderPath.ADMIN_GET_UNPROCESSED)
-    public ResponseTemplate getUnprocessed() {
-        return orderService.getUnprocessed();
+    public ResponseTemplate getUnprocessed(@RequestParam("page") Integer page) {
+        return orderService.getByStatus(page, 1);
     }
 
     // ROLE_ADMIN
     @GetMapping(OrderPath.ADMIN_SEARCH_UNPROCESSED)
-    public ResponseTemplate searchUnprocessed() {
-        return orderService.searchUnprocessed();
+    public ResponseTemplate searchUnprocessed(@RequestParam("page") Integer page,
+                                              @RequestParam("orderNumber") String orderNumber) {
+        int[] statusId = {1};
+        return orderService.searchByOrderNumberAndStatus(page, orderNumber, statusId);
     }
 
 }

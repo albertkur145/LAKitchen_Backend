@@ -7,6 +7,7 @@ import com.lakitchen.LA.Kitchen.api.requestbody.role_user.order.helper.ProductHe
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetById;
 import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetByStatus;
+import com.lakitchen.LA.Kitchen.api.response.data.role_admin.order.GetUnprocessed;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetAllForAssessment;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetByUserId;
 import com.lakitchen.LA.Kitchen.api.response.data.role_user.order.GetDetailByNumber;
@@ -214,15 +215,9 @@ public class OrderServiceImpl implements OrderService {
     public ResponseTemplate getByStatus(Integer page, Integer statusId) {
         Pageable paging = PageRequest.of((page-1), 10, Sort.by("createdAt").descending());
         Page<Order> orders = orderRepository.findByOrderStatus_Id(paging, statusId);
-        ArrayList<OrderGeneralDTO> dtos = new ArrayList<>();
-
-        orders.getContent().forEach((val) -> {
-            dtos.add(orderMapper.mapToOrderGeneralDTO(val, val.getPayment(), val.getOrderStatus()));
-        });
+        ArrayList<OrderGeneralDTO> dto = this.helperMapToOrderGeneralDTO(orders);
         PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
-
-        return new ResponseTemplate(200, "OK",
-                new GetByStatus(dtos), pageableDTO, null);
+        return new ResponseTemplate(200, "OK", new GetByStatus(dto), pageableDTO, null);
     }
 
     @Override
@@ -260,18 +255,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseTemplate confirmUnprocessed() {
-        return null;
+    public ResponseTemplate searchByOrderNumberAndStatus(Integer page, String orderNumber, int[] statusId) {
+        Pageable paging = PageRequest.of((page-1), 10, Sort.by("createdAt").descending());
+        ArrayList<OrderStatus> orderStatus = this.getMultipleOrderStatus(statusId);
+        Page<Order> orders = orderRepository
+                .findByOrderNumberContainingAndOrderStatusIn(paging, orderNumber, orderStatus);
+
+        ArrayList<OrderGeneralDTO> dto = this.helperMapToOrderGeneralDTO(orders);
+        PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
+        return new ResponseTemplate(200, "OK", dto, pageableDTO, null);
     }
 
-    @Override
-    public ResponseTemplate getUnprocessed() {
-        return null;
+    private ArrayList<OrderGeneralDTO> helperMapToOrderGeneralDTO(Page<Order> orders) {
+        ArrayList<OrderGeneralDTO> dto = new ArrayList<>();
+        orders.getContent().forEach((val) -> {
+            dto.add(orderMapper.mapToOrderGeneralDTO(val, val.getPayment(), val.getOrderStatus()));
+        });
+        return dto;
     }
-
-    @Override
-    public ResponseTemplate searchUnprocessed() {
-        return null;
+    
+    private ArrayList<OrderStatus> getMultipleOrderStatus(int[] statusId) {
+        ArrayList<OrderStatus> status = new ArrayList<>();
+        for (int i = 0; i < statusId.length; i++) {
+            status.add(orderStatusRepository.findFirstById(statusId[i]));
+        }
+        return status;
     }
 
     private BasicResult validateUpdateStatusOrder(UpdateStatusRequest request) {
