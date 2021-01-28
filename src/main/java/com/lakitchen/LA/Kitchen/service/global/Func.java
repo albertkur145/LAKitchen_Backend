@@ -1,5 +1,6 @@
 package com.lakitchen.LA.Kitchen.service.global;
 
+import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import com.lakitchen.LA.Kitchen.api.dto.PageableDTO;
 import com.lakitchen.LA.Kitchen.repository.ProductRepository;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
@@ -47,6 +48,10 @@ public class Func {
     public PageableDTO mapToPageableDTO(Page<?> data) {
         return new PageableDTO((data.getNumber()+1),
                 (int) data.getTotalElements(), data.getSize());
+    }
+
+    public IdNameDTO mapToIdNameDTO(Integer id, String name) {
+        return new IdNameDTO(id, name);
     }
 
     public String getFormatDateIndonesian(Timestamp param) {

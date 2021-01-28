@@ -51,7 +51,7 @@ public class ReportServiceImpl implements ReportService {
         Integer productSoldToday = reportMapper.getQuantityOrderProduct(orders);
 
         Integer newUsers = userRepository.countNewUsers();
-        Integer allUser = (int) userRepository.count();
+        Integer allUser = userRepository.countAllUser();
         ArrayList<Report2DTO> payments = paymentRepository.findLastWeek();
 
         DashboardOrderDTO orderDTO = reportMapper.mapToDashboardOrderDTO(orderToday, orderPrepared, orderReadyToShip, orderInDelivery);
