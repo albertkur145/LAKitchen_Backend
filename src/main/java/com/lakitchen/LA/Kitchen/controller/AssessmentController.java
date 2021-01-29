@@ -26,4 +26,24 @@ public class AssessmentController {
     public ResponseTemplate getAll(@RequestParam("productId") Integer productId) {
         return assessmentService.getAll(productId);
     }
+
+    // ROLE_ADMIN
+    @GetMapping(AssessmentPath.ADMIN_ASSESSMENT_GET_DETAIL)
+    public ResponseTemplate getByProductId(@RequestParam("productId") Integer productId) {
+        return assessmentService.getByProductId(productId);
+    }
+
+    // ROLE_ADMIN
+    @GetMapping(AssessmentPath.ADMIN_ASSESSMENT_GET_ALL_COMMENT)
+    public ResponseTemplate getAllComment(@RequestParam("productId") Integer productId,
+                                          @RequestParam("page") Integer page) {
+        return assessmentService.getAllComment(productId, page);
+    }
+
+    // ROLE_ADMIN
+    @DeleteMapping(AssessmentPath.ADMIN_ASSESSMENT_DELETE_COMMENT)
+    public ResponseTemplate deleteComment(@RequestParam("id") Integer id) {
+        return assessmentService.deleteComment(id);
+    }
+
 }

@@ -75,7 +75,7 @@ public class ProductMapper {
             String dateOfAssessment = dateFormat.format(val.getCreatedAt());
             IdNameDTO userDTO = new IdNameDTO(val.getUser().getId(), val.getUser().getName());
             ProductAssessmentDTO dto = new ProductAssessmentDTO(val.getId(), userDTO,
-                    val.getRate().intValue(), val.getComment(), dateOfAssessment);
+                    val.getRate().intValue(), val.getComment(), dateOfAssessment, val.getDeletedAt());
             assessmentDTOS.add(dto);
         }
 

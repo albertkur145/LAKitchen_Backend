@@ -147,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findFirstById(productId);
             ArrayList<ProductPhoto> photos = productPhotoRepository.findByProduct_Id(productId);
             ArrayList<ProductAssessment> assessments = productAssessmentRepository
-                    .findByProduct_IdOrderByCreatedAtDescRateDesc(productId);
+                    .findByProduct_IdOrderByCreatedAtDesc(productId);
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {

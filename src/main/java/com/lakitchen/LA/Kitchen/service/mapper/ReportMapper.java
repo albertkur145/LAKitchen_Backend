@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Service
@@ -52,10 +55,20 @@ public class ReportMapper {
 
     public ArrayList<ReportDTO> helperMapFromReport2DTO(ArrayList<Report2DTO> dto) {
         ArrayList<ReportDTO> dtos = new ArrayList<>();
-        dto.forEach((val) -> {
-            Timestamp timestamp = Timestamp.valueOf(val.getCreatedAt() + " 00:00:00");
-            dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(timestamp), val.getIncome()));
+        ArrayList<String> oneWeek = this.getOneWeekDay();
+
+        oneWeek.forEach((val) -> {
+            Report2DTO item = this.findDateExist(dto, val);
+            Timestamp timestamp = Timestamp.valueOf(val + " 00:00:00");
+            Integer income = 0;
+
+            if (item != null) {
+                timestamp = Timestamp.valueOf(item.getCreatedAt() + " 00:00:00");
+                income = item.getIncome();
+            }
+            dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(timestamp), income));
         });
+
         return dtos;
     }
 
@@ -74,6 +87,29 @@ public class ReportMapper {
             qty[0] += orderDetailRepository.sumQuantityByOrderNumber(val.getOrderNumber());
         });
         return qty[0];
+    }
+
+    private ArrayList<String> getOneWeekDay() {
+        ArrayList<String> days = new ArrayList<>();
+        LocalDate day = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            String month = String.valueOf(day.getMonthValue());
+            if (day.getMonthValue() < 10) {
+                month = "0" + day.getMonthValue();
+            }
+            String date = day.getYear() + "-" + month + "-" + day.minusDays(i).getDayOfMonth();
+            days.add(date);
+        }
+        return days;
+    }
+
+    private Report2DTO findDateExist(ArrayList<Report2DTO> dto, String date) {
+        for (Report2DTO val : dto) {
+            if (String.valueOf(val.getCreatedAt()).equals(date)) {
+                return val;
+            }
+        }
+        return null;
     }
 
 }

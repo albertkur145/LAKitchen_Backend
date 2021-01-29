@@ -7,9 +7,9 @@ import java.sql.Timestamp;
 
 @Data
 @AllArgsConstructor
-public class AssessmentDTO {
+public class Assessment2DTO {
     Integer id;
-    IdNameDTO user;
+    String username;
     Integer rate;
     String comment;
     String date;
