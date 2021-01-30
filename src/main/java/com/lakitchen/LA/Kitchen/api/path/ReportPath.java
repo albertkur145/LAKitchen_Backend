@@ -8,5 +8,9 @@ public class ReportPath {
 
     // ROLE_ADMIN
     public static final String ADMIN_GET_DASHBOARD = ADMIN_API + "/dashboard";
+    public static final String ADMIN_REPORT = ADMIN_API + "/report";
+    public static final String ADMIN_GET_SALES_TODAY = ADMIN_REPORT + "/salestoday";
+    public static final String ADMIN_GET_MONTHLY_INCOME = ADMIN_REPORT + "/income/monthly";
+    public static final String ADMIN_GET_ANNUAL_INCOME = ADMIN_REPORT + "/income/annual";
 
 }

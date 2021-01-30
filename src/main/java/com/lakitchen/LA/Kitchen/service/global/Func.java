@@ -63,7 +63,7 @@ public class Func {
         return day + " " + month + " " + year;
     }
 
-    private String getMonthIndonesian(Integer month) {
+    public String getMonthIndonesian(Integer month) {
         switch (month) {
             case 1:
                 return "Januari";

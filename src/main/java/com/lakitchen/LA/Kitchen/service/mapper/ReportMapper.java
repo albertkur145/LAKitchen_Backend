@@ -45,6 +45,10 @@ public class ReportMapper {
         return new ReportDTO(date, income);
     }
 
+    public ReportAnnualDTO mapToReportAnnualDTO(String month, Integer income) {
+        return new ReportAnnualDTO(month, income);
+    }
+
     public ArrayList<ReportDTO> helperMapReportDTO(ArrayList<Payment> payments) {
         ArrayList<ReportDTO> dtos = new ArrayList<>();
         payments.forEach((val) -> {
@@ -53,7 +57,7 @@ public class ReportMapper {
         return dtos;
     }
 
-    public ArrayList<ReportDTO> helperMapFromReport2DTO(ArrayList<Report2DTO> dto) {
+    public ArrayList<ReportDTO> helperMapFromReport2DTOWeekly(ArrayList<Report2DTO> dto) {
         ArrayList<ReportDTO> dtos = new ArrayList<>();
         ArrayList<String> oneWeek = this.getOneWeekDay();
 
@@ -70,6 +74,49 @@ public class ReportMapper {
         });
 
         return dtos;
+    }
+
+    public ArrayList<ReportDTO> helperMapFromReport2DTOMonthly(ArrayList<Report2DTO> dto) {
+        ArrayList<ReportDTO> dtos = new ArrayList<>();
+        dto.forEach((val) -> {
+            Timestamp timestamp = Timestamp.valueOf(val.getCreatedAt() + " 00:00:00");
+            Integer income = val.getIncome();
+            dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(timestamp), income));
+        });
+        return dtos;
+    }
+
+    public ArrayList<ReportAnnualDTO> helperMapFromReport3DTOMonthly(ArrayList<Report3DTO> dto) {
+        ArrayList<ReportAnnualDTO> dtos = new ArrayList<>();
+
+        for (int i = 1; i <= 12; i++) {
+            Report3DTO item = this.findMonthExist(dto, i);
+            String month = FUNC.getMonthIndonesian(i);
+            Integer income = 0;
+
+            if (item != null) {
+                month = FUNC.getMonthIndonesian(item.getMonth());
+                income = item.getIncome();
+            }
+            dtos.add(this.mapToReportAnnualDTO(month, income));
+        }
+        return dtos;
+    }
+
+    public Integer getTotalIncome(ArrayList<Report2DTO> dto) {
+        int[] total = {0};
+        dto.forEach((val) -> {
+            total[0] += val.getIncome();
+        });
+        return total[0];
+    }
+
+    public Integer getTotalIncome2(ArrayList<Report3DTO> dto) {
+        int[] total = {0};
+        dto.forEach((val) -> {
+            total[0] += val.getIncome();
+        });
+        return total[0];
     }
 
     public Integer getIncome(ArrayList<Order> orders) {
@@ -106,6 +153,15 @@ public class ReportMapper {
     private Report2DTO findDateExist(ArrayList<Report2DTO> dto, String date) {
         for (Report2DTO val : dto) {
             if (String.valueOf(val.getCreatedAt()).equals(date)) {
+                return val;
+            }
+        }
+        return null;
+    }
+
+    private Report3DTO findMonthExist(ArrayList<Report3DTO> dto, Integer month) {
+        for (Report3DTO val : dto) {
+            if (val.getMonth().equals(month)) {
                 return val;
             }
         }

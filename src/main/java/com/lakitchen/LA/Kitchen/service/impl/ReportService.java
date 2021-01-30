@@ -6,5 +6,8 @@ public interface ReportService {
 
     // ROLE_ADMIN
     ResponseTemplate getAllDashboard();
+    ResponseTemplate getSalesToday();
+    ResponseTemplate getMonthlyIncome(String year, String month);
+    ResponseTemplate getAnnualIncome(String year);
 
 }
