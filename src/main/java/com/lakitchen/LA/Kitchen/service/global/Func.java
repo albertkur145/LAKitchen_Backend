@@ -63,6 +63,12 @@ public class Func {
         return day + " " + month + " " + year;
     }
 
+    public String getFormatSimpleTime(Timestamp param) {
+        String[] strings = String.valueOf(param).split(" ");
+        String[] time = strings[1].split(":");
+        return time[0] + ":" + time[1];
+    }
+
     public String getMonthIndonesian(Integer month) {
         switch (month) {
             case 1:

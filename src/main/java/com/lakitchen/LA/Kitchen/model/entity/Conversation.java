@@ -38,7 +38,7 @@ public class Conversation implements Serializable {
     private String message;
 
     @Column(name = ConversationConstant.IS_READ)
-    private Boolean isRead;
+    private Integer isRead;
 
     @Column(name = ConversationConstant.CREATED_AT)
     private Timestamp createdAt;

@@ -7,4 +7,5 @@ public class CallConstant {
     public static final String CS_ID = "cs_id";
     public static final String IS_ENDED = "is_ended";
     public static final String CREATED_AT = "created_at";
+    public static final String RECEIVED_AT = "received_at";
 }

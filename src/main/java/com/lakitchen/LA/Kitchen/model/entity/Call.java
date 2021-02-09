@@ -31,10 +31,13 @@ public class Call implements Serializable {
     private User cs;
 
     @Column(name = CallConstant.IS_ENDED)
-    private Boolean isEnded;
+    private Integer isEnded;
 
     @Column(name = CallConstant.CREATED_AT)
     private Timestamp createdAt;
+
+    @Column(name = CallConstant.RECEIVED_AT)
+    private Timestamp receivedAt;
 
     @JsonIgnore
     @OneToMany(mappedBy = "call", fetch = FetchType.LAZY)

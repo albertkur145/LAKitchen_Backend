@@ -140,12 +140,13 @@ public class ReportMapper {
         ArrayList<String> days = new ArrayList<>();
         LocalDate day = LocalDate.now();
         for (int i = 6; i >= 0; i--) {
+            LocalDate date = day.minusDays(i);
             String month = String.valueOf(day.getMonthValue());
-            if (day.getMonthValue() < 10) {
-                month = "0" + day.getMonthValue();
+            if (date.getMonthValue() < 10) {
+                month = "0" + date.getMonthValue();
             }
-            String date = day.getYear() + "-" + month + "-" + day.minusDays(i).getDayOfMonth();
-            days.add(date);
+            String simpleDate = date.getYear() + "-" + month + "-" + date.getDayOfMonth();
+            days.add(simpleDate);
         }
         return days;
     }
