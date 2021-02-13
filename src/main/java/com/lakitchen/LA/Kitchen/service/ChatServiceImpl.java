@@ -4,6 +4,7 @@ import com.lakitchen.LA.Kitchen.api.dto.ContactDTO;
 import com.lakitchen.LA.Kitchen.api.dto.MessageDTO;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_cs.ReceiveCallRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.chat.CallRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.shared.ReadMessageRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.shared.SendMessageRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.role_cs.GetCall;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -101,6 +101,24 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ResponseTemplate readMessage(ReadMessageRequest request) {
+        Call call = callRepository.findFirstById(request.getCallId());
+
+        if (call == null || request.getUserFrom() == null) {
+            return new ResponseTemplate(404, "NOT FOUND",
+                    null, null, "Call tidak ditemukan");
+        }
+
+        if (request.getUserFrom() == null) {
+            return new ResponseTemplate(404, "NOT FOUND",
+                    null, null, "Sepertinya belum ada pesan");
+        }
+
+        conversationRepository.updateIsRead(request.getCallId(), request.getUserFrom());
+        return new ResponseTemplate(200, "OK", null, null, null);
+    }
+
+    @Override
     public ResponseTemplate receiveCall(ReceiveCallRequest request) {
         Call call = callRepository.findFirstById(request.getId());
         call.setCs(userRepository.findFirstById(request.getCsId()));
@@ -122,7 +140,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ResponseTemplate getContact(Integer csId) {
-        ArrayList<Call> calls = callRepository.findByCs_IdAndIsEnded(csId, 0);
+        ArrayList<Call> calls = callRepository
+                .findByCs_IdAndIsEndedOrderByCreatedAtDesc(csId, 0);
         ArrayList<ContactDTO> dto = this.helperMapToContactDTO(calls);
         return new ResponseTemplate(200, "OK",
                 new GetContact(dto), null, null);
@@ -168,7 +187,9 @@ public class ChatServiceImpl implements ChatService {
     private ArrayList<ContactDTO> helperMapToContactDTO(ArrayList<Call> calls) {
         ArrayList<ContactDTO> dto = new ArrayList<>();
         calls.forEach((val) -> {
-            dto.add(callMapper.mapToContactDTO(val, 0));
+            Integer unreadMessages = conversationRepository
+                    .countByIsReadAndCall_IdAndFrom_Id(0, val.getId(), val.getUser().getId());
+            dto.add(callMapper.mapToContactDTO(val, unreadMessages));
         });
         return dto;
     }

@@ -70,6 +70,7 @@ public class ReportMapper {
                 timestamp = Timestamp.valueOf(item.getCreatedAt() + " 00:00:00");
                 income = item.getIncome();
             }
+
             dtos.add(this.mapToReportDTO(FUNC.getFormatDateSlash(timestamp), income));
         });
 
@@ -138,14 +139,18 @@ public class ReportMapper {
 
     private ArrayList<String> getOneWeekDay() {
         ArrayList<String> days = new ArrayList<>();
-        LocalDate day = LocalDate.now();
+        LocalDate now = LocalDate.now();
         for (int i = 6; i >= 0; i--) {
-            LocalDate date = day.minusDays(i);
-            String month = String.valueOf(day.getMonthValue());
+            LocalDate date = now.minusDays(i);
+            String month = String.valueOf(date.getMonthValue());
+            String day = String.valueOf(date.getDayOfMonth());
             if (date.getMonthValue() < 10) {
                 month = "0" + date.getMonthValue();
             }
-            String simpleDate = date.getYear() + "-" + month + "-" + date.getDayOfMonth();
+            if (date.getDayOfMonth() < 10) {
+                day = "0" + date.getDayOfMonth();
+            }
+            String simpleDate = date.getYear() + "-" + month + "-" + day;
             days.add(simpleDate);
         }
         return days;

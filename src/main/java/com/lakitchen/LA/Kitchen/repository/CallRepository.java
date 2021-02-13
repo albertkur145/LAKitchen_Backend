@@ -13,6 +13,6 @@ public interface CallRepository extends JpaRepository<Call, Integer> {
     Call findFirstByIdAndIsEndedAndCsIsNotNull(Integer id, Integer isEnded);
     Call findFirstByIdAndIsEnded(Integer id, Integer isEnded);
     ArrayList<Call> findByReceivedAtIsNullOrderByCreatedAtAsc();
-    ArrayList<Call> findByCs_IdAndIsEnded(Integer csId, Integer isEnded);
+    ArrayList<Call> findByCs_IdAndIsEndedOrderByCreatedAtDesc(Integer csId, Integer isEnded);
 
 }

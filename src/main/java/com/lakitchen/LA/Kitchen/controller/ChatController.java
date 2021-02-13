@@ -1,11 +1,14 @@
 package com.lakitchen.LA.Kitchen.controller;
 
+import com.lakitchen.LA.Kitchen.api.dto.IdNameDTO;
 import com.lakitchen.LA.Kitchen.api.dto.MessageDTO;
 import com.lakitchen.LA.Kitchen.api.path.ChatPath;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_cs.ReceiveCallRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.chat.CallRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.shared.ReadMessageRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.shared.SendMessageRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
+import com.lakitchen.LA.Kitchen.api.response.data.role_cs.ReceiveCall;
 import com.lakitchen.LA.Kitchen.service.ChatServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -46,8 +49,8 @@ public class ChatController {
     }
 
     // ROLE_USER
-    private void announceReceived(Object payload) {
-        simpMessagingTemplate.convertAndSend("/call/accepted", payload);
+    private void announceReceived(Integer callId, Object payload) {
+        simpMessagingTemplate.convertAndSend("/call/accepted/" + callId, payload);
     }
 
     // ROLE_CS
@@ -67,8 +70,9 @@ public class ChatController {
         if (res.getCode() != 200) {
             return null;
         }
+        ReceiveCall payload = (ReceiveCall) res.getData();
         this.receivedCall(this.getAllCall().getData());
-        this.announceReceived(res.getData());
+        this.announceReceived(payload.getContact().getCallId(), payload);
         return res;
     }
 
@@ -109,8 +113,15 @@ public class ChatController {
         if (res.getCode() != 200) {
             return res;
         }
-        this.endedCallCh(callId);
+        IdNameDTO data = new IdNameDTO(callId, null);
+        this.endedCallCh(callId, data);
         return res;
+    }
+
+    // ROLE_CS & ROLE_USER
+    @PostMapping(ChatPath.CHAT_READ_MESSAGE)
+    public ResponseTemplate readMessage(@RequestBody ReadMessageRequest objParam) {
+        return chatService.readMessage(objParam);
     }
 
     // ROLE_CS & ROLE_USER
@@ -119,8 +130,8 @@ public class ChatController {
     }
 
     // ROLE_CS & ROLE_USER
-    private void endedCallCh(Integer callId) {
-        simpMessagingTemplate.convertAndSend("/call/ended/" + callId, true);
+    private void endedCallCh(Integer callId, Object payload) {
+        simpMessagingTemplate.convertAndSend("/call/ended/" + callId, payload);
     }
 
 }

@@ -2,6 +2,7 @@ package com.lakitchen.LA.Kitchen.service.impl;
 
 import com.lakitchen.LA.Kitchen.api.requestbody.role_cs.ReceiveCallRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.role_user.chat.CallRequest;
+import com.lakitchen.LA.Kitchen.api.requestbody.shared.ReadMessageRequest;
 import com.lakitchen.LA.Kitchen.api.requestbody.shared.SendMessageRequest;
 import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 
@@ -20,5 +21,6 @@ public interface ChatService {
     ResponseTemplate sendMessage(SendMessageRequest request);
     ResponseTemplate getAllMessage(Integer callId);
     ResponseTemplate endCall(Integer callId);
+    ResponseTemplate readMessage(ReadMessageRequest request);
 
 }

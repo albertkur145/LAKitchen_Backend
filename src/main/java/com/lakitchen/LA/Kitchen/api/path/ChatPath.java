@@ -23,5 +23,6 @@ public class ChatPath {
 
     // ROLE_USER & ROLE_CS ENDPOINT
     public static final String CHAT_SEND_MESSAGE = CHAT + "";
+    public static final String CHAT_READ_MESSAGE = CHAT + "/message";
     public static final String CHAT_END_CALL = CHAT + "/call";
 }
