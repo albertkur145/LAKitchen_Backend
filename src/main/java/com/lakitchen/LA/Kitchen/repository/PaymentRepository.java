@@ -14,26 +14,26 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
     Payment findFirstByOrder_OrderNumber(String orderNumber);
 
-    @Query(value = "SELECT TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
+    @Query(value = "SELECT TO_DATE(CAST(o.paid_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
             "SUM(p.total) as income FROM payments p " +
             "JOIN orders o ON (p.order_number = o.order_number) " +
-            "WHERE TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
-            "AND TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) " +
+            "WHERE TO_DATE(CAST(o.paid_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
+            "AND TO_DATE(CAST(o.paid_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) " +
             "GROUP BY createdAt ORDER BY createdAt ASC", nativeQuery = true)
     ArrayList<Report2DTO> findLastWeek();
 
-    @Query(value = "SELECT TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
+    @Query(value = "SELECT TO_DATE(CAST(o.paid_at as TEXT), 'YYYY-MM-DD') as createdAt, " +
             "SUM(p.total) as income " +
             "FROM payments p JOIN orders o ON (p.order_number = o.order_number) " +
-            "WHERE EXTRACT(YEAR FROM o.finished_at) = ?1 AND " +
-            "EXTRACT(MONTH FROM o.finished_at) = ?2 " +
+            "WHERE EXTRACT(YEAR FROM o.paid_at) = ?1 AND " +
+            "EXTRACT(MONTH FROM o.paid_at) = ?2 " +
             "GROUP BY createdAt ORDER BY createdAt ASC", nativeQuery = true)
     ArrayList<Report2DTO> findMonthly(Integer year, Integer month);
 
-    @Query(value = "SELECT EXTRACT(MONTH FROM o.finished_at) as month, " +
+    @Query(value = "SELECT EXTRACT(MONTH FROM o.paid_at) as month, " +
             "SUM(p.total) as income " +
             "FROM payments p JOIN orders o ON (p.order_number = o.order_number) " +
-            "WHERE EXTRACT(YEAR FROM o.finished_at) = ?1 " +
+            "WHERE EXTRACT(YEAR FROM o.paid_at) = ?1 " +
             "GROUP BY month ORDER BY month ASC", nativeQuery = true)
     ArrayList<Report3DTO> findAnnual(Integer year);
 

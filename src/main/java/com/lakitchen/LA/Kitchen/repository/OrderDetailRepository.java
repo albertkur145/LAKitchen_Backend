@@ -45,7 +45,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
             "SUM(od.quantity) as sold FROM order_detail od " +
             "JOIN products p ON (od.product_id = p.id) " +
             "JOIN orders o ON (od.order_number = o.order_number) " +
-            "WHERE TO_DATE(CAST(o.finished_at as TEXT), 'YYYY-MM-DD') = CURRENT_DATE " +
+            "WHERE TO_DATE(CAST(o.paid_at as TEXT), 'YYYY-MM-DD') = CURRENT_DATE " +
             "GROUP BY od.product_id, p.name, od.price " +
             "ORDER BY p.name", nativeQuery = true)
     ArrayList<SalesTodayDTO> findSalesToday();

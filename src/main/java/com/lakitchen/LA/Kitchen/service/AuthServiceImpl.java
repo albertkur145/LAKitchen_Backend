@@ -6,11 +6,17 @@ import com.lakitchen.LA.Kitchen.api.response.ResponseTemplate;
 import com.lakitchen.LA.Kitchen.api.response.data.shared.Login;
 import com.lakitchen.LA.Kitchen.model.entity.User;
 import com.lakitchen.LA.Kitchen.repository.UserRepository;
+import com.lakitchen.LA.Kitchen.security.JwtTokenProvider;
 import com.lakitchen.LA.Kitchen.service.impl.AuthService;
 import com.lakitchen.LA.Kitchen.service.mapper.UserMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,17 +30,32 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtTokenProvider tokenProvider;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Override
     public ResponseTemplate login(LoginRequest request) {
         BasicResult result = this.validationLogin(request);
 
         if (result.getResult()) {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = tokenProvider.generateToken(authentication);
             User user = userRepository.findFirstByEmail(request.getEmail());
             UserDTO userDTO = userMapper.mapToUserDTO(user);
-            String uuid = UUID.randomUUID().toString();
-
             return new ResponseTemplate(200, "OK",
-                    new Login(uuid, userDTO),
+                    new Login(jwt, userDTO),
                     null, null);
         }
 

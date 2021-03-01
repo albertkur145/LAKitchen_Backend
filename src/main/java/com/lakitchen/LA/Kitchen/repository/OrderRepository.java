@@ -34,13 +34,13 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     ArrayList<Order> findByCurrentDate(Integer statusId);
 
     @Query(value = "SELECT * FROM orders WHERE " +
-            "TO_DATE(CAST(finished_at as TEXT), 'YYYY-MM-DD') = CURRENT_DATE ",
+            "TO_DATE(CAST(paid_at as TEXT), 'YYYY-MM-DD') = CURRENT_DATE ",
             nativeQuery = true)
     ArrayList<Order> findByFinishedDate();
 
     @Query(value = "SELECT * FROM orders WHERE " +
-            "TO_DATE(CAST(finished_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
-            "AND TO_DATE(CAST(finished_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) ",
+            "TO_DATE(CAST(paid_at as TEXT), 'YYYY-MM-DD') <= CURRENT_DATE " +
+            "AND TO_DATE(CAST(paid_at as TEXT), 'YYYY-MM-DD') > (CURRENT_DATE - 7) ",
             nativeQuery = true)
     ArrayList<Order> findByLastWeek();
 

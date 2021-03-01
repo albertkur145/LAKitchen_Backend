@@ -22,4 +22,5 @@ public class AuthController {
     public ResponseTemplate login(@RequestBody LoginRequest objParam) {
         return authService.login(objParam);
     }
+
 }
