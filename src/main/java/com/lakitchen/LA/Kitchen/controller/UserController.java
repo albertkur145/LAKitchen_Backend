@@ -34,6 +34,13 @@ public class UserController {
     }
 
     // ROLE_USER
+    @GetMapping(UserPath.USER_ACTIVATION)
+    public ResponseTemplate update(@RequestParam("st") String userMail,
+                                   @RequestParam("nd") String userPass) {
+        return userService.activation(userMail, userPass);
+    }
+
+    // ROLE_USER
     @PutMapping(UserPath.USER_CHANGE_PASSWORD)
     public ResponseTemplate changePassword(@RequestBody ChangePasswordRequest objParam) {
         return userService.changePassword(objParam);

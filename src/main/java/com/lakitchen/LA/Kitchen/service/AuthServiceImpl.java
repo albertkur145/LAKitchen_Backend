@@ -69,8 +69,12 @@ public class AuthServiceImpl implements AuthService {
             return new BasicResult(false, "Email tidak terdaftar", "NOT FOUND", 404);
         }
 
-        if (user.getUserStatus().getId() != 1) {
+        if (user.getUserStatus().getId() == 2) {
             return new BasicResult(false, "Akun ini telah diblokir", "NOT ACCEPTABLE", 406);
+        }
+
+        if (user.getUserStatus().getId() == 3) {
+            return new BasicResult(false, "Dibutuhkan aktivasi email", "NOT ACCEPTABLE", 406);
         }
 
         if (!this.isPasswordMatch(request.getPassword(), user.getPassword())) {

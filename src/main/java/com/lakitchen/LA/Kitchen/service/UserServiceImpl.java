@@ -22,13 +22,18 @@ import com.lakitchen.LA.Kitchen.service.global.Func;
 import com.lakitchen.LA.Kitchen.service.impl.UserService;
 import com.lakitchen.LA.Kitchen.service.mapper.UserMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.ArrayList;
 
@@ -48,7 +53,13 @@ public class UserServiceImpl implements UserService {
     private Func FUNC;
 
     @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Autowired
     private UserMapper userMapper;
+
+    @Value("${app.frontendBaseUrl}")
+    private String frontendBaseUrl;
 
     @Override
     public ResponseTemplate register(RegisterRequest request) {
@@ -57,13 +68,16 @@ public class UserServiceImpl implements UserService {
         if (result.getResult()) {
             User user = new User();
 
-            user.setUserStatus(this.activeStatus());
+            String userMail = request.getEmail();
+            String userPass = this.BCryptEncoder(request.getPassword());
+            user.setUserStatus(this.unActiveStatus());
             user.setUserRole(this.roleUser());
-            user.setEmail(request.getEmail());
-            user.setPassword(this.BCryptEncoder(request.getPassword()));
+            user.setEmail(userMail);
+            user.setPassword(userPass);
             user.setPhoneNumber(request.getPhoneNumber());
             user.setCreatedAt(FUNC.getCurrentTimestamp());
 
+            this.sendActivationMail(userMail, userPass);
             userRepository.save(user);
 
             return new ResponseTemplate(200, "OK", null, null, null);
@@ -225,6 +239,57 @@ public class UserServiceImpl implements UserService {
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
     }
 
+    @Override
+    public ResponseTemplate activation(String userMail, String userPass) {
+        BasicResult result = this.validationActivation(userMail, userPass);
+
+        if (result.getResult()) {
+            User user = userRepository.findFirstByEmail(this.decodedStr(userMail));
+            user.setUserStatus(this.activeStatus());
+            userRepository.save(user);
+            return new ResponseTemplate(200, "OK", null, null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    private void sendActivationMail(String userMail, String userPass) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(userMail);
+        mail.setSubject("Aktivasi Akun LA' Kitchen");
+        mail.setText("Silahkan klik link berikut untuk aktivasi akun LA' Kitchen : " +
+                frontendBaseUrl + "/user/activation/" + this.encodedStr(userMail) +
+                "/" + userPass);
+        javaMailSender.send(mail);
+    }
+
+    private String baseUrl() {
+        ServletUriComponentsBuilder sv = null;
+        return sv.fromCurrentContextPath().build().toUriString();
+    }
+
+    private String encodedStr(String str) {
+        return new String(Base64.encodeBase64(str.getBytes()));
+    }
+
+    private String decodedStr(String str) {
+        return new String(Base64.decodeBase64(str.getBytes()));
+    }
+
+    private BasicResult validationActivation(String userMail, String userPass) {
+        if (userMail == null || userPass == null) {
+            return new BasicResult(false, null, "FORBIDDEN", 403);
+        }
+
+        String email = this.decodedStr(userMail);
+        User user = userRepository.findFirstByEmailAndPassword(email, userPass);
+
+        if (user == null) {
+            return new BasicResult(false, null, "FORBIDDEN", 403);
+        }
+        return new BasicResult(true, null, "OK", 200);
+    }
+
     private BasicResult validationUpdateEmployee(UpdateUserRequest request) {
         if (request.getId() == null || request.getName() == null || request.getPhoneNumber() == null
         || request.getAddress() == null || request.getProvince() == null || request.getCity() == null) {
@@ -306,6 +371,10 @@ public class UserServiceImpl implements UserService {
 
     private UserStatus activeStatus() {
         return userStatusRepository.findFirstById(1);
+    }
+
+    private UserStatus unActiveStatus() {
+        return userStatusRepository.findFirstById(3);
     }
 
     private UserRole roleUser() {

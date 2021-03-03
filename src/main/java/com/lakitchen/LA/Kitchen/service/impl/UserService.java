@@ -26,4 +26,7 @@ public interface UserService {
     ResponseTemplate getById(Integer id);
     ResponseTemplate createEmployee(NewUserRequest request);
     ResponseTemplate updateEmployee(UpdateUserRequest request);
+
+    // SHARED
+    ResponseTemplate activation(String userMail, String userPass);
 }
