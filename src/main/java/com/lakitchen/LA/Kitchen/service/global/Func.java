@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -43,6 +45,16 @@ public class Func {
     public String getFormatDateSimplified(Timestamp param) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM yyyy");
         return dateFormat.format(param);
+    }
+
+    public String currencyIndonesian(Integer number) {
+        DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getCurrencyInstance();
+        DecimalFormatSymbols format = new DecimalFormatSymbols();
+        format.setCurrencySymbol("Rp ");
+        format.setGroupingSeparator('.');
+        decimalFormat.setDecimalFormatSymbols(format);
+
+        return decimalFormat.format(number);
     }
 
     public PageableDTO mapToPageableDTO(Page<?> data) {

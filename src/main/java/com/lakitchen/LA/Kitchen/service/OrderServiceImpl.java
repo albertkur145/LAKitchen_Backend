@@ -22,12 +22,19 @@ import com.lakitchen.LA.Kitchen.service.mapper.ProductMapper;
 import com.lakitchen.LA.Kitchen.service.mapper.UserMapper;
 import com.lakitchen.LA.Kitchen.validation.BasicResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,6 +77,12 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     CartRepository cartRepository;
 
+    @Value("${app.frontendBaseUrl}")
+    private String frontendBaseUrl;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     @Autowired
     Func FUNC;
 
@@ -80,8 +93,9 @@ public class OrderServiceImpl implements OrderService {
         if (result.getResult()) {
             Order order = new Order();
             User user = userRepository.findFirstById(request.getUserId());
+            String orderNumber = this.setOrderNumber();
 
-            order.setOrderNumber(this.setOrderNumber());
+            order.setOrderNumber(orderNumber);
             order.setCreatedAt(FUNC.getCurrentTimestamp());
             order.setOrderStatus(orderStatusRepository.findFirstById(1));
             order.setUser(user);
@@ -111,6 +125,8 @@ public class OrderServiceImpl implements OrderService {
             payment.setCreatedAt(FUNC.getCurrentTimestamp());
             payment.setPaymentMethod(paymentMethodRepository.findFirstById(1));
             paymentRepository.save(payment);
+            this.sendNotifyOrderUser(user.getEmail(), orderNumber, totalPayment[0]);
+            this.sendNotifyOrderAdmin("lakitchenind@gmail.com", orderNumber);
 
             return new ResponseTemplate(200, "OK", null, null, null);
         }
@@ -279,6 +295,32 @@ public class OrderServiceImpl implements OrderService {
         ArrayList<OrderGeneralDTO> dto = this.helperMapToOrderGeneralDTO(orders);
         PageableDTO pageableDTO = FUNC.mapToPageableDTO(orders);
         return new ResponseTemplate(200, "OK", new SearchOrder(dto), pageableDTO, null);
+    }
+
+    private void sendNotifyOrderUser(String userMail, String orderNumber, Integer payment) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        String formatPayment = this.FUNC.currencyIndonesian(payment + 15000);
+        mail.setTo(userMail);
+        mail.setSubject("Lakukan Pembayaran Order - LA' Kitchen");
+        mail.setText("Lakukan pembayaran pada nomor pesanan " + orderNumber +
+                " dengan total tagihan " + formatPayment +
+                "\nNomor rekening : 85550004875 a/n Lidia Cornelius" +
+                "\n\nUntuk lebih lengkapnya, silahkan lihat detail " +
+                "pesanan pada link berikut : " +
+                frontendBaseUrl + "/order/" + orderNumber +
+                "\nNB: Silahkan konfirmasi melalui live chat " +
+                "atau membalas email ini (sertakan nomor pesanan) " +
+                "jika sudah melakukan pembayaran");
+        javaMailSender.send(mail);
+    }
+
+    private void sendNotifyOrderAdmin(String userMail, String orderNumber) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(userMail);
+        mail.setSubject("Hai, Ada Pesanan Baru Datang Nih !!");
+        mail.setText("Untuk lebih lengkapnya, silahkan lihat detail pesanan pada link berikut : " +
+                frontendBaseUrl + "/admin/order/" + orderNumber);
+        javaMailSender.send(mail);
     }
 
     private ArrayList<OrderGeneralDTO> helperMapToOrderGeneralDTO(Page<Order> orders) {

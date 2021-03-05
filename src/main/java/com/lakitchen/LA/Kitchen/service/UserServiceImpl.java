@@ -258,8 +258,9 @@ public class UserServiceImpl implements UserService {
         mail.setTo(userMail);
         mail.setSubject("Aktivasi Akun LA' Kitchen");
         mail.setText("Silahkan klik link berikut untuk aktivasi akun LA' Kitchen : " +
-                frontendBaseUrl + "/user/activation/" + this.encodedStr(userMail) +
-                "/" + userPass);
+                frontendBaseUrl + "/user/activation" +
+                "?nd=" + userPass +
+                "&st=" + this.encodedStr(userMail));
         javaMailSender.send(mail);
     }
 

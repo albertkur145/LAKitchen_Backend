@@ -29,9 +29,23 @@ public class ProductController {
     }
 
     // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_SUBCATEGORY_LIMIT)
+    public ResponseTemplate getBySubCategoryLimit(@RequestParam("subCategoryId") Integer subCategoryId,
+                                                  @RequestParam("limit") Integer limit) {
+        return productService.getBySubCategoryLimit(subCategoryId, limit);
+    }
+
+    // ROLE_USER
     @GetMapping(ProductPath.GET_PRODUCT_BY_CATEGORY)
     public ResponseTemplate getByCategory(@RequestParam("categoryId") Integer categoryId) {
         return productService.getByCategory(categoryId);
+    }
+
+    // ROLE_USER
+    @GetMapping(ProductPath.GET_PRODUCT_BY_CATEGORY_LIMIT)
+    public ResponseTemplate getByCategoryLimit(@RequestParam("categoryId") Integer categoryId,
+                                               @RequestParam("limit") Integer limit) {
+        return productService.getByCategoryLimit(categoryId, limit);
     }
 
     // ROLE_USER

@@ -14,7 +14,9 @@ public interface ProductService {
 
     // ROLE_USER
     ResponseTemplate getBySubCategory(Integer subCategoryId);
+    ResponseTemplate getBySubCategoryLimit(Integer subCategoryId, Integer limit);
     ResponseTemplate getByCategory(Integer categoryId);
+    ResponseTemplate getByCategoryLimit(Integer categoryId, Integer limit);
     ResponseTemplate getByName(String productName);
     ResponseTemplate getByPrice(String from);
     ResponseTemplate getById(Integer productId);

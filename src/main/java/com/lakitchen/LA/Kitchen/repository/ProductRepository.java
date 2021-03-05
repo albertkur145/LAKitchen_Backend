@@ -20,11 +20,36 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     ArrayList<Product> findAllByDeletedAtOrderByPriceDesc(Timestamp deletedAt);
 
     @Query(value = "SELECT * FROM products p " +
+            "WHERE p.deleted_at IS null " +
+            "ORDER BY p.price ASC LIMIT 60",
+            nativeQuery = true)
+    ArrayList<Product> findByPriceAsc();
+
+    @Query(value = "SELECT * FROM products p " +
+            "WHERE p.deleted_at IS null " +
+            "ORDER BY p.price DESC LIMIT 60",
+            nativeQuery = true)
+    ArrayList<Product> findByPriceDesc();
+
+    @Query(value = "SELECT * FROM products p " +
+            "JOIN sub_categories s ON (p.sub_category_id = s.id) " +
+            "WHERE s.id = ?1 AND p.deleted_at IS null LIMIT ?2",
+            nativeQuery = true)
+    ArrayList<Product> findBySubCategoryLimit(Integer categoryId, Integer limit);
+
+    @Query(value = "SELECT * FROM products p " +
             "JOIN sub_categories s ON (p.sub_category_id = s.id) " +
             "JOIN categories cg ON (s.category_id = cg.id) " +
             "WHERE cg.id = ?1 AND p.deleted_at IS null",
             nativeQuery = true)
     ArrayList<Product> findByCategory(Integer categoryId);
+
+    @Query(value = "SELECT * FROM products p " +
+            "JOIN sub_categories s ON (p.sub_category_id = s.id) " +
+            "JOIN categories cg ON (s.category_id = cg.id) " +
+            "WHERE cg.id = ?1 AND p.deleted_at IS null LIMIT ?2",
+            nativeQuery = true)
+    ArrayList<Product> findByCategoryLimit(Integer categoryId, Integer limit);
 
     @Query(value = "SELECT * FROM products p " +
             "JOIN sub_categories s ON (p.sub_category_id = s.id) " +

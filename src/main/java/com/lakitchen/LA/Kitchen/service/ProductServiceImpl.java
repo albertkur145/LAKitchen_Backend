@@ -90,6 +90,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ResponseTemplate getBySubCategoryLimit(Integer subCategoryId, Integer limit) {
+        BasicResult result = this.validationGetBySubCategory(subCategoryId);
+
+        if (result.getResult()) {
+            ArrayList<Product> products = productRepository
+                    .findBySubCategoryLimit(subCategoryId, limit);
+            ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
+            ProductSubCategory subCategory = productSubCategoryRepository.findFirstById(subCategoryId);
+
+            products.forEach((val) -> {
+                ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
+                productDTO.add(dto);
+            });
+
+            return new ResponseTemplate(200, "OK",
+                    new GetBySubCategory(subCategory.getName(), productDTO),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
     public ResponseTemplate getByCategory(Integer categoryId) {
         BasicResult result = this.validationGetByCategory(categoryId);
 
@@ -109,6 +132,28 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());
+    }
+
+    @Override
+    public ResponseTemplate getByCategoryLimit(Integer categoryId, Integer limit) {
+        BasicResult result = this.validationGetByCategory(categoryId);
+
+        if (result.getResult()) {
+            ArrayList<Product> products = productRepository.findByCategoryLimit(categoryId, limit);
+            ArrayList<ProductGeneralDTO> productDTO = new ArrayList<>();
+            ProductCategory category = productCategoryRepository.findFirstById(categoryId);
+
+            products.forEach((val) -> {
+                ProductGeneralDTO dto = productMapper.setToFormatGeneralDTO(val);
+                productDTO.add(dto);
+            });
+
+            return new ResponseTemplate(200, "OK",
+                    new GetByCategory(category.getName(), productDTO),
+                    null, null);
+        }
+
+        return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, null);
     }
 
     @Override
@@ -453,10 +498,9 @@ public class ProductServiceImpl implements ProductService {
 
     private ArrayList<Product> getSelectionPrice(String from) {
         if (from.equals("lowest")) {
-            return productRepository.findAllByDeletedAtOrderByPriceAsc(null);
+            return productRepository.findByPriceAsc();
         }
-
-        return productRepository.findAllByDeletedAtOrderByPriceDesc(null);
+        return productRepository.findByPriceDesc();
     }
 
     private BasicResult validationDeleteProduct(Integer productId) {
