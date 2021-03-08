@@ -17,12 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(
-        allowCredentials = "true",
-        origins = "https://www.lakitchen.site",
-        allowedHeaders = "*",
-        methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.DELETE,RequestMethod.PUT}
-)
 public class ChatController {
 
     @Autowired
