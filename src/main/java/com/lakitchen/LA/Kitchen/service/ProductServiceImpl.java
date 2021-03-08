@@ -196,7 +196,7 @@ public class ProductServiceImpl implements ProductService {
 
             ArrayList<ProductPhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach((val) -> {
-                photoDTOS.add(productMapper.mapToProductPhotoDTO(val));
+                photoDTOS.add(productMapper.mapToProductPhotoURLDTO(val));
             });
 
             Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(product.getId());
@@ -234,6 +234,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (result.getResult()) {
             this.deleteProductPhotos(productId);
+            ArrayList<String> photos = new ArrayList<>();
             files.forEach((file) -> {
                 String uuid = UUID.randomUUID().toString();
                 String filename = StringUtils.cleanPath(file.getOriginalFilename());
@@ -245,15 +246,16 @@ public class ProductServiceImpl implements ProductService {
                 productPhoto.setFilename(filename);
                 productPhoto.setProduct(productRepository.findFirstById(productId));
                 productPhotoRepository.save(productPhoto);
+                photos.add(filename);
 
-                try {
-                    this.saveFile(productMapper.getProjectDir(), filename, file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    this.saveFile(productMapper.getProjectDir(), filename, file);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             });
 
-            return new ResponseTemplate(200, "OK", null, null, null);
+            return new ResponseTemplate(200, "OK", photos, null, null);
         }
 
         return new ResponseTemplate(result.getCode(), result.getStatus(), null, null, result.getError());

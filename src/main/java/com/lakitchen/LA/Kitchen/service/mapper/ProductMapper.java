@@ -7,13 +7,12 @@ import com.lakitchen.LA.Kitchen.repository.ProductPhotoRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.RoundingMode;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -29,6 +28,9 @@ public class ProductMapper {
     private ProductAssessmentRepository productAssessmentRepository;
 
     private String projectDir = "D:/project/LA Kitchen/Backend/src/uploads/";
+
+    @Value("${app.phpImageUrl}")
+    private String phpDir;
 
     public String getProjectDir() {
         return this.projectDir;
@@ -113,12 +115,16 @@ public class ProductMapper {
         return new ProductPhotoDTO(photo.getId(), photoLink);
     }
 
+    public ProductPhotoDTO mapToProductPhotoURLDTO(ProductPhoto photo) {
+        return new ProductPhotoDTO(photo.getId(), phpDir + photo.getFilename());
+    }
+
     public ProductCartDTO mapToProductCartDTO(Product product, Cart cart) {
         return new ProductCartDTO(
                 product.getId(),
                 product.getName(),
                 product.getPrice(),
-                this.getPhotoLink(product.getId()),
+                this.getPhotoLinkDeployed(product.getId()),
                 cart.getQuantity(),
                 cart.getNote()
         );
@@ -128,7 +134,7 @@ public class ProductMapper {
         return new ProductSimplifiedDTO(
                 product.getId(),
                 product.getName(),
-                this.getPhotoLink(product.getId())
+                this.getPhotoLinkDeployed(product.getId())
         );
     }
 
@@ -138,7 +144,7 @@ public class ProductMapper {
                 orderDetail.getProduct().getName(),
                 orderDetail.getPrice(),
                 orderDetail.getQuantity(),
-                this.getPhotoLink(orderDetail.getProduct().getId()),
+                this.getPhotoLinkDeployed(orderDetail.getProduct().getId()),
                 orderDetail.getIsAssessment()
         );
     }
@@ -157,7 +163,8 @@ public class ProductMapper {
                 .findByProduct_Id(val.getId());
         Integer totalAssessment = productAssessmentRepository.countAllByProduct_Id(val.getId());
         Double rating = this.getRating(this.sumRate(productAssessments), totalAssessment);
-        String photoLink = this.getPhotoLink(val.getId());
+//        String photoLink = this.getPhotoLink(val.getId());
+        String photoLink = this.getPhotoLinkDeployed(val.getId());
 
         return this.mapToProductGeneralDTO(val, photoLink, rating, totalAssessment);
     }
@@ -168,6 +175,11 @@ public class ProductMapper {
         }
 
         return null;
+    }
+
+    public String getPhotoLinkDeployed(Integer productId) {
+        ProductPhoto productPhoto = productPhotoRepository.findFirstByProduct_Id(productId);
+        return phpDir + productPhoto.getFilename();
     }
 
     public String getPhotoLink(Integer productId) {
@@ -224,8 +236,8 @@ public class ProductMapper {
     }
 
     public byte[] getImageWithMediaType(String imageName) throws IOException {
-        Path destination = Paths.get(projectDir + imageName);
-        return IOUtils.toByteArray(destination.toUri());
+//        Path destination = Paths.get(projectDir + imageName);
+        return IOUtils.toByteArray(new URL(phpDir + imageName));
     }
 
     public String getExtensionFile(String filename) {
