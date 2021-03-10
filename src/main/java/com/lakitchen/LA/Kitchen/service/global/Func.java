@@ -8,13 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Calendar;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 public class Func {
@@ -38,8 +39,10 @@ public class Func {
     }
 
     public String getFormatDateSlash(Timestamp param) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        return dateFormat.format(param);
+        ZonedDateTime dateTime = this.getJakartaTimeZone(param);
+        String[] strings = String.valueOf(dateTime).split("T");
+        String[] date = strings[0].split("-");
+        return date[2] + "/" + date[1] + "/" + date[0];
     }
 
     public String getFormatDateSimplified(Timestamp param) {
@@ -67,18 +70,26 @@ public class Func {
     }
 
     public String getFormatDateIndonesian(Timestamp param) {
-        LocalDateTime local = param.toLocalDateTime();
+        ZonedDateTime dateTime = this.getJakartaTimeZone(param);
+        LocalDateTime local = dateTime.toLocalDateTime();
         String day = String.valueOf(local.getDayOfMonth());
         String month = this.getMonthIndonesian(local.getMonthValue());
         String year = String.valueOf(local.getYear());
-
+        
         return day + " " + month + " " + year;
     }
 
     public String getFormatSimpleTime(Timestamp param) {
-        String[] strings = String.valueOf(param).split(" ");
+        ZonedDateTime dateTime = this.getJakartaTimeZone(param);
+        String[] strings = String.valueOf(dateTime).split(" ");
         String[] time = strings[1].split(":");
         return time[0] + ":" + time[1];
+    }
+
+    public ZonedDateTime getJakartaTimeZone(Timestamp param) {
+        Instant now = param.toInstant();
+        ZoneId zone = ZoneId.of("Asia/Jakarta");
+        return ZonedDateTime.ofInstant(now, zone);
     }
 
     public String getMonthIndonesian(Integer month) {
