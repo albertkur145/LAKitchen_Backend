@@ -80,8 +80,8 @@ public class Func {
     }
 
     public String getFormatSimpleTime(Timestamp param) {
-//        ZonedDateTime dateTime = this.getJakartaTimeZone(param);
-        String[] strings = String.valueOf(param).split(" ");
+        ZonedDateTime dateTime = this.getJakartaTimeZone(param);
+        String[] strings = String.valueOf(dateTime).split("T");
         String[] time = strings[1].split(":");
         return time[0] + ":" + time[1];
     }
